@@ -16,6 +16,7 @@ func main() {
 
 	configs.ConnectToDB()
 	configs.MigrateDB()
+	configs.InitMajors()
 
 	app := gin.Default()
 

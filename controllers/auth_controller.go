@@ -1,9 +1,11 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/devanfer02/gokers/helpers"
+	"github.com/devanfer02/gokers/helpers/res"
+	"github.com/devanfer02/gokers/helpers/status"
+	"github.com/devanfer02/gokers/models"
 	"github.com/devanfer02/gokers/services"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthController struct {
@@ -12,7 +14,16 @@ type AuthController struct {
 }
 
 func (auth *AuthController) RegisterStudent(ctx *gin.Context) {
-	helpers.Response(ctx, 200, "hello world!", "ini data")	
+	var student models.Student
+
+	if err := ctx.ShouldBindJSON(&student); err != nil {
+		res.SendResponse(ctx,  res.CreateResponseErr(status.BadRequest, "bad body request", err))
+		return 
+	}
+
+	response := auth.Service.RegisterStudent(student)
+
+	res.SendResponse(ctx, response)
 }
 
 func (auth *AuthController) LoginStudent(ctx *gin.Context) {
