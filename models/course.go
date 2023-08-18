@@ -1,11 +1,9 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Course struct {
-	gorm.Model
-	Name 	string	`gorm:"varchar(155);not null" json:"name" valid:"required"`
-	Code 	string 	`gorm:"varchar(8);not null" json:"code" valid:"required,stringlength(8|8)"`
+	Model 
+	CourseName 	string	 `gorm:"type:varchar(155);not null" json:"name" valid:"required,alpha"`
+	CourseCode 	string 	 `gorm:"type:varchar(8);not null" json:"code" valid:"required,alpha,stringlength(8|8)"`
+	Sks			int		 `gorm:"type:integer;default:1" json:"sks" valid:"required,int"`
+	Course   	[]Course `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
