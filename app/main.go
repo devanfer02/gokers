@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	//"github.com/devanfer02/gokers/configs"
+	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -14,8 +14,8 @@ func main() {
 		panic(err)
 	}
 
-	// configs.ConnectToDB()
-	// configs.MigrateDB()
+	configs.ConnectToDB()
+	configs.MigrateDB()
 
 	app := gin.Default()
 

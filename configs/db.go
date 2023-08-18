@@ -13,10 +13,10 @@ var DB *gorm.DB
 
 func ConnectToDB() {
 	dsn := fmt.Sprintf(
-		"%s%s:@tcp(%s)/%s?parseTime=true",
-		os.Getenv("DB_USERNAME"),
+		"%s%s:@tcp(%s)/%s?parseTime=true", 
+		os.Getenv("DB_USERNAME"), 
 		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_CONNECTION"),
+		os.Getenv("DB_CONNECTION"), 
 		os.Getenv("DB_NAME"),
 	)
 
@@ -30,10 +30,17 @@ func ConnectToDB() {
 }
 
 func MigrateDB() {
+	if (DB == nil) {
+		fmt.Printf("ERR MIGRATING DB")
+		return 
+	}
+
 	migrate(
 		&models.Student{},
 		&models.Course{},
 		&models.Class{},
+		&models.KRS{},
+		&models.Lecturer{},
 	)
 }
 

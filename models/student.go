@@ -16,6 +16,6 @@ type Student struct {
 }
 
 type StudentAuth struct {
-	Nim 		string 		`gorm:"type:varchar(16);not null" json:"nim" valid:"required,stringlength(16|16)"`
+	Nim 		string 		`gorm:"type:varchar(18);not null" json:"nim" valid:"required,stringlength(16|16)"`
 	Password 	string 		`gorm:"type:varchar(255);not null" json:"password" valid:"required,stringlength(8|255),isalphanum"`
 }

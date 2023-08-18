@@ -5,5 +5,5 @@ type Course struct {
 	CourseName 	string	 `gorm:"type:varchar(155);not null" json:"name" valid:"required,alpha"`
 	CourseCode 	string 	 `gorm:"type:varchar(8);not null" json:"code" valid:"required,alpha,stringlength(8|8)"`
 	Sks			int		 `gorm:"type:integer;default:1" json:"sks" valid:"required,int"`
-	Course   	[]Course `gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Class   	[]Class  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
