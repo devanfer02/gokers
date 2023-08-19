@@ -1,16 +1,14 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/devanfer02/gokers/configs"
+	"github.com/devanfer02/gokers/helpers"
 	"github.com/devanfer02/gokers/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/golang-jwt/jwt/v4"
 )
 
 func RequireAuth(ctx *gin.Context) {
@@ -21,15 +19,7 @@ func RequireAuth(ctx *gin.Context) {
 		return 
 	}
 
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
-		}
-
-		return []byte(os.Getenv("SECRET_KEY")), nil 
-	})
-
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok, token := helpers.CreateMapClaims(tokenStr)
 
 	if !ok || !token.Valid {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
@@ -51,6 +41,37 @@ func RequireAuth(ctx *gin.Context) {
 	}
 
 	ctx.Set("std", student)
+	ctx.Next()
+}
 
+func RequireAdmin(ctx *gin.Context) {
+	tokenStr, err := ctx.Cookie("AdminAuthorization")
+
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+	}
+
+	claims, ok, token := helpers.CreateMapClaims(tokenStr)
+
+	if !ok || !token.Valid {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return 
+	}
+
+	if float64(time.Now().Unix()) > claims["exp"].(float64) {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return 
+	}
+
+	var admin models.Admin
+
+	configs.DB.First(&admin, claims["adm"])
+
+	if admID, err := uuid.Parse(admin.ID.String()); err != nil || admID == uuid.Nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return 
+	}
+
+	ctx.Set("adm", admin)
 	ctx.Next()
 }

@@ -15,7 +15,7 @@ type AuthController struct {
 	Service 	services.AuthService
 }
 
-func (auth *AuthController) RegisterStudent(ctx *gin.Context) {
+func (self *AuthController) RegisterStudent(ctx *gin.Context) {
 	var student models.Student
 
 	if err := ctx.ShouldBindJSON(&student); err != nil {
@@ -23,12 +23,12 @@ func (auth *AuthController) RegisterStudent(ctx *gin.Context) {
 		return 
 	}
 
-	response := auth.Service.RegisterStudent(student)
+	response := self.Service.RegisterStudent(student)
 
 	res.SendResponse(ctx, response)
 }
 
-func (auth *AuthController) LoginStudent(ctx *gin.Context) {
+func (self *AuthController) LoginStudent(ctx *gin.Context) {
 	var studentAuth models.StudentAuth
 
 	if err := ctx.ShouldBindJSON(&studentAuth); err != nil {
@@ -36,7 +36,7 @@ func (auth *AuthController) LoginStudent(ctx *gin.Context) {
 		return
 	}
 
-	response, token := auth.Service.LoginStudent(studentAuth)
+	response, token := self.Service.LoginStudent(studentAuth)
 
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", token, 3600 * 12, "", "", true, true)
@@ -44,14 +44,14 @@ func (auth *AuthController) LoginStudent(ctx *gin.Context) {
 	res.SendResponse(ctx, response)
 }
 
-func (auth *AuthController) LogoutStudent(ctx *gin.Context) {
+func (self *AuthController) LogoutStudent(ctx *gin.Context) {
 	ctx.Set("std", nil)
 	ctx.SetCookie("Authorization", "", -1, "", "", true, true)
 
 	res.SendResponse(ctx, res.CreateResponse(status.Ok, "student successfully logout", nil))
 }
 
-func (auth *AuthController) RegisterLecturer(ctx *gin.Context) {
+func (self *AuthController) RegisterLecturer(ctx *gin.Context) {
 	var lecturer models.Lecturer
 
 	if err := ctx.ShouldBindJSON(&lecturer); err != nil {
@@ -59,7 +59,7 @@ func (auth *AuthController) RegisterLecturer(ctx *gin.Context) {
 		return 
 	}
 
-	response := auth.Service.RegisterLecturer(lecturer)
+	response := self.Service.RegisterLecturer(lecturer)
 
 	res.SendResponse(ctx, response)
 }

@@ -12,7 +12,7 @@ func InitRouteAuth(router *gin.Engine) {
 		Service: services.AuthService{},
 	}
 
-	authStudent := router.Group("/auth/student")
+	authStudent := authController.Router.Group("/auth/student")
 
 	authStudent.POST("/register", authController.RegisterStudent)
 	authStudent.POST("/login", authController.LoginStudent)
@@ -20,10 +20,4 @@ func InitRouteAuth(router *gin.Engine) {
 
 	authLecturer := router.Group("/auth/lecturer")
 	authLecturer.POST("/register", authController.RegisterLecturer)
-
-// 	authAdmin := router.Group("/auth/admin")
-
-// 	authAdmin.POST("/register")
-// 	authAdmin.POST("/login")
-// 	authAdmin.POST("/logout")
 }
