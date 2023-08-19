@@ -24,7 +24,7 @@ func CompPassword(db, body *string) error {
 }
 
 func CreateNIM(major, faculty, entrance string) (string, error) {
-	currentYear := time.Now().Year()
+	currentYear := time.Now().Year() % 100
 	twodigits	:= currentYear % 100
 	year		:= fmt.Sprintf("%02d", twodigits)
 
@@ -40,11 +40,29 @@ func CreateNIM(major, faculty, entrance string) (string, error) {
 
 	majorCode 	 := configs.FacultyMap[faculty][major]
 	entranceCode := determineEntranceCode(entrance)
-	lastCode     := determineLastCode(major, entrance)
+	lastCode     := determineLastCode("major = ? AND entrance = ?", models.Student{}, major, entrance)
 
 	nim := year + facultyCode + majorCode + entranceCode + lastCode
 
 	return nim, nil
+}
+
+func CreateNDN(major, faculty string) (string, error) {
+	yearCode 	:= fmt.Sprintf("%02d", (time.Now().Year() % 100))
+
+	facultyCode := configs.FacultyMap[faculty]["code"]
+	
+	if _, ok := configs.FacultyMap[faculty][major]; !ok {
+		return "", fmt.Errorf("major code doesnt exist, major: %s", major)
+	}
+
+	majorCode := configs.FacultyMap[faculty][major]
+	lastCode  := determineLastCode("major = ?", models.Lecturer{}, major)
+
+	nim := "00" + yearCode + facultyCode + majorCode + lastCode
+
+	return nim, nil
+
 }
 
 func GetTokenStr(id uuid.UUID) (string, error) {
@@ -78,14 +96,8 @@ func GenerateUUID() uuid.UUID {
 	return newUUID
 }
 
-func determineLastCode(major, entrance string) string {
-	var student models.Student
-	count := int64(0)
-
-	configs.DB.
-		Model(&student).
-		Where("major = ? AND entrance = ?", major, entrance).
-		Count(&count)
+func determineLastCode(query string, model interface{}, params ...string) string {
+	count := DbCount(query, model, params...)
 
 	if count++; count < 10 {
 		return fmt.Sprintf("00%d", count)
@@ -105,4 +117,15 @@ func determineEntranceCode(entrance string) string {
 	} 
 		
 	return "07111"
+}
+
+func DbCount(query string, model interface{}, params ...string) int64 {
+	count := int64(0)
+
+	configs.DB.
+		Model(&model).
+		Where(query, params).
+		Count(&count)
+
+	return count
 }

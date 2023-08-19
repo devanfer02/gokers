@@ -2,8 +2,8 @@
 
 ### List Entities
 1. [Student](#student)
-2. Class
-3. Lecturer
+2. [Lecturer](#lecturer)
+3. Class
 4. Krs
 
 ### Student
@@ -59,4 +59,15 @@
         "code": 200,
         "message": "student successfully logout"
     }
+    ```
+
+### Lecturer
+1. ##### Register Lecturer ```POST METHOD```
+    endpoint : ```auth/lecturer/register```     
+    json body request : 
+    ```
+    ```
+    json response : 
+    ```
+
     ```

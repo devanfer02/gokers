@@ -19,7 +19,7 @@ func (auth *AuthController) RegisterStudent(ctx *gin.Context) {
 	var student models.Student
 
 	if err := ctx.ShouldBindJSON(&student); err != nil {
-		res.SendResponse(ctx,  res.CreateResponseErr(status.BadRequest, "bad body request", err))
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))
 		return 
 	}
 
@@ -51,10 +51,15 @@ func (auth *AuthController) LogoutStudent(ctx *gin.Context) {
 	res.SendResponse(ctx, res.CreateResponse(status.Ok, "student successfully logout", nil))
 }
 
-func (auth *AuthController) LoginAdmin(ctx *gin.Context) {
+func (auth *AuthController) RegisterLecturer(ctx *gin.Context) {
+	var lecturer models.Lecturer
 
-}
+	if err := ctx.ShouldBindJSON(&lecturer); err != nil {
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))
+		return 
+	}
 
-func (auth *AuthController) LogoutAdmin(ctx *gin.Context) {
+	response := auth.Service.RegisterLecturer(lecturer)
 
+	res.SendResponse(ctx, response)
 }

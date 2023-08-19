@@ -20,14 +20,8 @@ func (auth *AuthService) RegisterStudent(student models.Student) res.Response {
 	if _, err := govalidator.ValidateStruct(student); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
-
-	var studentdb models.Student
-	count := int64(0)
-
-	configs.DB.
-		Model(&studentdb).
-		First(&studentdb, "email = ?", student.Email).
-		Count(&count)
+	
+	count := helpers.DbCount("email = ?", models.Student{}, student.Email)
 
 	if count > 0 {
 		return res.CreateResponseErr(status.Conflict, "email already in use", fmt.Errorf("email is already used"))
@@ -46,8 +40,6 @@ func (auth *AuthService) RegisterStudent(student models.Student) res.Response {
 	if err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
-
-	fmt.Println(student.Nim)
 
 	if err = configs.DB.Create(&student).Error; err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)
@@ -80,4 +72,38 @@ func (auth *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Response,
 	}
 
 	return res.CreateResponse(status.Accepted, "student successfully login", nil), token
+}
+
+func (auth *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Response {
+	if _, err := govalidator.ValidateStruct(lecturer); err != nil {
+		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
+	}
+
+	count := helpers.DbCount("email = ?", models.Lecturer{}, lecturer.Email)
+
+	if count > 0 {
+		return res.CreateResponseErr(status.Conflict, "email already in use", fmt.Errorf("email is already used"))
+	}
+
+	hashed, err := helpers.HashPassword(lecturer.Password)
+
+	if err != nil {
+		return res.CreateResponseErr(status.ServerError, "internal server error", err)
+	}
+
+	lecturer.Password  = hashed
+	lecturer.Ndn, err  = helpers.CreateNDN(lecturer.Major, lecturer.Faculty)
+	lecturer.ID 	   = helpers.GenerateUUID()
+
+	if err != nil {
+		return res.CreateResponseErr(status.ServerError, "internal server error", err)
+	}
+
+	if err = configs.DB.Create(&lecturer).Error; err != nil {
+		return res.CreateResponseErr(status.Conflict, "internal server error", err)
+	}
+
+	return res.CreateResponse(status.Ok, "student registered to system", gin.H {
+		"ndn": lecturer.Ndn,
+	})
 }

@@ -18,6 +18,9 @@ func InitRouteAuth(router *gin.Engine) {
 	authStudent.POST("/login", authController.LoginStudent)
 	authStudent.POST("/logout", authController.LogoutStudent)
 
+	authLecturer := router.Group("/auth/lecturer")
+	authLecturer.POST("/register", authController.RegisterLecturer)
+
 // 	authAdmin := router.Group("/auth/admin")
 
 // 	authAdmin.POST("/register")
