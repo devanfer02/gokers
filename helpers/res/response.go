@@ -9,7 +9,7 @@ type Response struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func CreateResponseOk(code int, message string, data interface{}) Response {
+func CreateResponse(code int, message string, data interface{}) Response {
 	return Response{
 		Status:  "success",
 		Code:    code,

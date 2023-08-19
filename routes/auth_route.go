@@ -8,15 +8,15 @@ import (
 
 func InitRouteAuth(router *gin.Engine) {
 	authController := controllers.AuthController{
-		Route: router,
+		Router: router,
 		Service: services.AuthService{},
 	}
 
 	authStudent := router.Group("/auth/student")
 
 	authStudent.POST("/register", authController.RegisterStudent)
-// 	authStudent.POST("/login")
-// 	authStudent.POST("/logout")
+	authStudent.POST("/login", authController.LoginStudent)
+	authStudent.POST("/logout", authController.LogoutStudent)
 
 // 	authAdmin := router.Group("/auth/admin")
 
