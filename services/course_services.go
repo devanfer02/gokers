@@ -24,7 +24,10 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 	count := courseSvc.Db.Count("course_code", models.Course{}, course.CourseCode)	
 
 	if count > 0 {
-		return res.CreateResponseErr(status.Conflict, "course code conflicted", fmt.Errorf("course code already exist"))
+		return res.CreateResponseErr(status.Conflict,
+			"course code conflicted",
+			fmt.Errorf("course code already exist"),
+		)
 	}
 
 	if err := helpers.CheckTypeExist(&course.Type, &course.Faculty, &course.Major); err != nil {
@@ -68,7 +71,10 @@ func (courseSvc *CourseService) GetCourses(course []models.Course, queries []str
 	}
 
 	if err != nil {
-		return res.CreateResponseErr(status.ServerError, "internal server error", err)
+		return res.CreateResponseErr(status.ServerError,
+			"internal server error", 
+			err,
+		)
 	}	
 
 	return res.CreateResponse(status.Ok, "sucessfully fetch course", course)
@@ -76,7 +82,11 @@ func (courseSvc *CourseService) GetCourses(course []models.Course, queries []str
 
 func (courseSvc *CourseService) GetCourse(course models.Course) res.Response {
 	if err := courseSvc.Db.Find("id = ?", &course, course.ID); err != nil {
-		return res.CreateResponseErr(status.ServerError, "internal server error", err)
+		return res.CreateResponseErr(
+			status.ServerError,
+			"internal server error",
+			err,
+		)
 	}
 
 	return res.CreateResponse(status.Ok, "sucessfully fetch course", course)
@@ -92,7 +102,11 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 	}	
 
 	if courseSvc.Db.Update("id = ?", &course, course.ID) == 0 {
-		return res.CreateResponseErr(status.ServerError, "failed to update data", fmt.Errorf("data value doesnt change probably"))
+		return res.CreateResponseErr(
+			status.ServerError,
+			"failed to update data",
+			fmt.Errorf("data value doesnt change or data doesnt exist"),
+		)
 	}
 
 	return res.CreateResponse(status.Ok, "course data updated", gin.H {
@@ -102,7 +116,10 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 
 func (courseSvc *CourseService) DeleteService(course models.Course) res.Response {
 	if courseSvc.Db.Delete("id = ?", course, course.ID) == 0 {
-		return res.CreateResponseErr(status.ServerError, "failed to delete data", fmt.Errorf("data didnt exist"))
+		return res.CreateResponseErr(status.ServerError,
+			"failed to delete data",
+			fmt.Errorf("data didnt exist"),
+		)
 	}
 
 	return res.CreateResponse(status.Ok, "successfully delete course", gin.H {

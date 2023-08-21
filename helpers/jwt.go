@@ -10,18 +10,15 @@ import (
 )
 
 
-func GetTokenStr(id uuid.UUID) (string, error) {
+func GetTokenStr(id uuid.UUID, subject string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": id, 
+		subject: id, 
 		"exp": time.Now().Add(time.Hour * 12).Unix(),
 	})
 
 	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
-
-	if err != nil {
-		return "", err
-	}
-	return tokenStr, nil
+	
+	return tokenStr, err 
 }
 
 func CreateMapClaims(tokenStr string) (jwt.MapClaims, bool, *jwt.Token ){

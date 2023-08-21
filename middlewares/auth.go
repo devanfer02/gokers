@@ -72,6 +72,7 @@ func (authMdl *AuthMiddleware) RequireAdmin(ctx *gin.Context) {
 	authMdl.Db.FirstByPK(&admin, claims["adm"])
 
 	if admID, err := uuid.Parse(admin.ID.String()); err != nil || admID == uuid.Nil {
+		// berhenti disini
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return 
 	}

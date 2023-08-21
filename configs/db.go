@@ -42,6 +42,7 @@ func (baseDb *Database) MigrateDB() {
 		&models.Class{},
 		&models.KRS{},
 		&models.Lecturer{},
+		&models.Admin{},
 	)
 }
 
@@ -62,7 +63,7 @@ func (baseDb *Database) FindFirst(query string, data interface{}, params ...inte
 }
 
 func (baseDb *Database) FirstByPK(data interface{}, param interface{}) {
-	baseDb.db.First(data, param)
+	baseDb.db.First(data, "id = ?", param)
 }
 
 func (baseDb *Database) Update(query string, data interface{}, params ...interface{}) int64 {

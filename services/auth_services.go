@@ -65,7 +65,7 @@ func (authSvc *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Respon
 		return res.CreateResponseErr(status.Forbidden, "invalid nim or password", nil), ""
 	}
 
-	token, err := helpers.GetTokenStr(student.ID)
+	token, err := helpers.GetTokenStr(student.ID, "sub")
 
 	if err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err), ""
@@ -107,3 +107,58 @@ func (authSvc *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Respo
 		"ndn": lecturer.Ndn,
 	})
 }
+
+func (authSvc *AuthService) RegisterAdmin(admin models.Admin) res.Response {
+	if _, err := govalidator.ValidateStruct(admin); err != nil {
+		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
+	}
+
+	count := authSvc.Db.Count("username = ?", models.Admin{}, admin.Username)
+
+	if count > 0 {
+		return res.CreateResponseErr(status.Conflict, "username already in use", fmt.Errorf("username is already used"))		
+	}
+
+	hashed, err := helpers.HashPassword(admin.Password)
+
+	if err != nil {
+		return res.CreateResponseErr(status.ServerError, "internal server error", err)		
+	}
+
+	admin.Password 	= hashed
+	admin.ID 		= helpers.GenerateUUID()
+
+	if err = authSvc.Db.Create(&admin); err != nil {
+		return res.CreateResponseErr(status.Conflict, "internal server error", err)
+	}
+
+	return res.CreateResponse(status.Ok, "admin registered to system", nil)
+}
+
+func (authSvc *AuthService) LoginAdmin(adminAuth models.Admin) (res.Response, string) {
+	if _, err := govalidator.ValidateStruct(adminAuth); err != nil {
+		return res.CreateResponseErr(status.BadRequest, "bad body request", err), ""
+	}
+
+	var admin models.Admin
+
+	if err := authSvc.Db.FindFirst("username = ?", &admin, adminAuth.Username); err != nil {
+		return res.CreateResponseErr(status.Forbidden, "invalid username or email or password", nil), ""
+	}
+
+	if err := helpers.CompPassword(&admin.Password, &adminAuth.Password); err != nil {
+		return res.CreateResponseErr(status.Forbidden, "invalid username or email or password", nil), ""
+	}
+
+	if admin.Email != adminAuth.Email {
+		return res.CreateResponseErr(status.Forbidden, "invalid username or email or password", nil), ""
+	}
+
+	token, err := helpers.GetTokenStr(admin.ID, "adm")
+
+	if err != nil {
+		return res.CreateResponseErr(status.ServerError, "internal server error", err), ""
+	}
+
+	return res.CreateResponse(status.Accepted, "admin successfully login", nil), token
+}	

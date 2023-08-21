@@ -37,6 +37,11 @@ func (authCtr *AuthController) LoginStudent(ctx *gin.Context) {
 
 	response, token := authCtr.Service.LoginStudent(studentAuth)
 
+	if token == "" {
+		res.SendResponse(ctx, response)
+		return
+	}
+
 	ctx.SetSameSite(http.SameSiteLaxMode)
 	ctx.SetCookie("Authorization", token, 3600 * 12, "", "", true, true)
 
@@ -61,4 +66,45 @@ func (authCtr *AuthController) RegisterLecturer(ctx *gin.Context) {
 	response := authCtr.Service.RegisterLecturer(lecturer)
 
 	res.SendResponse(ctx, response)
+}
+
+func (authCtr *AuthController) RegisterAdmin(ctx *gin.Context) {
+	var admin models.Admin
+
+	if err := ctx.ShouldBindJSON(&admin); err != nil {
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))
+		return 
+	}
+
+	response := authCtr.Service.RegisterAdmin(admin);
+
+	res.SendResponse(ctx, response)
+}
+
+func (authCtr *AuthController) LoginAdmin(ctx *gin.Context) {
+	var admin models.Admin
+	
+	if err := ctx.ShouldBindJSON(&admin); err != nil {
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))
+		return
+	}
+
+	response, token := authCtr.Service.LoginAdmin(admin)
+
+	if token == "" {
+		res.SendResponse(ctx, response)
+		return
+	}
+
+	ctx.SetSameSite(http.SameSiteLaxMode)
+	ctx.SetCookie("AdminAuthorization", token, 3600 * 6, "", "", true, true)
+
+	res.SendResponse(ctx, response)
+}
+
+func (autCtr *AuthController) LogoutAdmin(ctx *gin.Context) {
+	ctx.Set("adm", nil) 
+	ctx.SetCookie("AdminAuthorization", "", -1, "", "", true, true)
+
+	res.SendResponse(ctx, res.CreateResponse(status.Ok, "admin successfully logout", nil))
 }

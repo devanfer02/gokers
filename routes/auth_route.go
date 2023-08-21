@@ -20,4 +20,9 @@ func (r *Router) InitRouteAuth() {
 
 	authLecturer := r.Router.Group("/auth/lecturer")
 	authLecturer.POST("/register", authController.RegisterLecturer)
+
+	authAdmin := r.Router.Group("/auth/admin")
+	authAdmin.POST("/register", authController.RegisterAdmin)
+	authAdmin.POST("/login", authController.LoginAdmin)
+	authAdmin.POST("/logout", authController.LogoutAdmin)
 }
