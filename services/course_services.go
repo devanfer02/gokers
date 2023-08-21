@@ -27,7 +27,12 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 		return res.CreateResponseErr(status.Conflict, "course code conflicted", fmt.Errorf("course code already exist"))
 	}
 
+	if err := helpers.CheckTypeExist(&course.Type, &course.Faculty, &course.Major); err != nil {
+		return res.CreateResponseErr(status.BadRequest, "types or faculty or major doesnt exist", err)
+	}
+
 	course.ID = helpers.GenerateUUID()
+	
 
 	if err := courseSvc.Db.Create(&course); err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
@@ -38,13 +43,28 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 	})
 }
 
-func (courseSvc *CourseService) GetCourses(course []models.Course, typequery string) res.Response {
+func (courseSvc *CourseService) GetCourses(course []models.Course, queries []string) res.Response {
 	var err error 
 
-	if typequery == "" {
+	if queries[0] == "" && queries[1] == "" && queries[2] == ""{ 
 		err = courseSvc.Db.FindAll(&course);
 	} else {
-		err = courseSvc.Db.Find("type = ?", &course, typequery)
+		var query, param string
+		if queries[0] != ""  {
+			query = "type = ?"
+			param = queries[0]
+		}
+		if queries[1] != "" {
+			query = "faculty = ?"
+			param = queries[1]
+		}
+
+		if  queries[2] != "" {
+			query = "major = ?"
+			param = queries[2]
+		}
+
+		err = courseSvc.Db.Find(query, &course, param)
 	}
 
 	if err != nil {
@@ -67,6 +87,10 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 
+	if err := helpers.CheckTypeExist(&course.Type, &course.Faculty, &course.Major); err != nil {
+		return res.CreateResponseErr(status.BadRequest, "types or faculty or major doesnt exist", err)
+	}	
+
 	if courseSvc.Db.Update("id = ?", &course, course.ID) == 0 {
 		return res.CreateResponseErr(status.ServerError, "failed to update data", fmt.Errorf("data value doesnt change probably"))
 	}
@@ -81,5 +105,7 @@ func (courseSvc *CourseService) DeleteService(course models.Course) res.Response
 		return res.CreateResponseErr(status.ServerError, "failed to delete data", fmt.Errorf("data didnt exist"))
 	}
 
-	return res.CreateResponse(status.Ok, "successfully delete course", nil)
+	return res.CreateResponse(status.Ok, "successfully delete course", gin.H {
+		"deleted_record_data": course,
+	})
 }

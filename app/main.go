@@ -15,17 +15,22 @@ func main() {
 		panic(err)
 	}
 
-	db := configs.Database{}
+	app := gin.Default()
+	db := &configs.Database{}
+	router := router.Router{
+		Router: app, 
+		Db: db,
+	}
 
 	db.ConnectToDB()
 	db.MigrateDB()
 
 	configs.InitMajors()
-
-	app := gin.Default()
+	
 	app.Use(middlewares.InterceptApi)
 
-	router.InitRouteAuth(app, &db)
+	router.InitRouteAuth()
+	router.InitRouteCourse()
 
 	app.Run(os.Getenv("APP_PORT"))
 }

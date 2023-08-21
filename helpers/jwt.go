@@ -27,7 +27,7 @@ func GetTokenStr(id uuid.UUID) (string, error) {
 func CreateMapClaims(tokenStr string) (jwt.MapClaims, bool, *jwt.Token ){
 	token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
+			return nil, fmt.Errorf("unexpected signing method")
 		}
 
 		return []byte(os.Getenv("SECRET_KEY")), nil 

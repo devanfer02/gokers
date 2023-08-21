@@ -3,11 +3,54 @@ package helpers
 import (
 	"fmt"
 	"time"
+	"unicode"
 
 	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/models"
 	"github.com/google/uuid"
 )
+
+func CheckTypeExist(types, faculty, major *string) error {
+	if *types != "university" && *types != "faculty" && *types != "major" {
+		return fmt.Errorf("types must at least be university or faculty or major, requested types: %s", *types)
+	}
+
+	if *types == "university" {
+		*faculty = ""
+		*major = ""
+		return nil
+	}
+
+	if *types == "faculty" {
+		if !isAllUpper(*faculty) {
+			return fmt.Errorf("faculty must be all uppercase")
+		}
+		if _, ok := configs.FacultyMap[*faculty]; !ok {
+			return fmt.Errorf("faculty doesnt exist, requested faculty: %s", *faculty)
+		}
+		return nil
+	}
+
+	if *types == "major" {
+		if !isAllUpper(*faculty) {
+			return fmt.Errorf("faculty must be all uppercase")
+		}
+
+		facultyMap, ok := configs.FacultyMap[*faculty]
+
+		if !ok {
+			return fmt.Errorf("faculty doesnt exist, requested faculty: %s", *faculty)
+		}
+
+		if _, ok := facultyMap[*major]; !ok {
+			return fmt.Errorf("major doesnt exist, requested major: %s", *major)
+		}
+
+		return nil
+	}
+
+	return nil
+}
 
 func CreateNIM(major, faculty, entrance string, Db *configs.Database) (string, error) {
 	currentYear := time.Now().Year() % 100
@@ -79,3 +122,12 @@ func determineEntranceCode(entrance string) string {
 	return "07111"
 }
 
+func isAllUpper(s string) bool {
+	for _, char := range s {
+		if !unicode.IsUpper(char) {
+			return false
+		}
+	}
+
+	return true
+}

@@ -9,13 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
 type Database struct {
-	DB *gorm.DB 
+	db *gorm.DB 
 }
 
-func (selfs *Database) ConnectToDB() {
+func (baseDb *Database) ConnectToDB() {
 	dsn := fmt.Sprintf(
 		"%s%s:@tcp(%s)/%s?parseTime=true", 
 		os.Getenv("DB_USERNAME"), 
@@ -30,17 +28,15 @@ func (selfs *Database) ConnectToDB() {
 		panic(err)
 	}
 
-	selfs.DB = db
-	DB = db
+	baseDb.db = db
 }
 
-func (selfs *Database) MigrateDB() {
-	if (selfs.DB == nil) {
-		fmt.Printf("ERR MIGRATING DB")
-		return 
+func (baseDb *Database) MigrateDB() {
+	if (baseDb.db == nil) {
+		panic(fmt.Errorf("ERROR MIGRATING DB"))
 	}
 
-	selfs.migrate(
+	baseDb.migrate(
 		&models.Student{},
 		&models.Course{},
 		&models.Class{},
@@ -49,34 +45,38 @@ func (selfs *Database) MigrateDB() {
 	)
 }
 
-func (selfs *Database) Create(data interface{}) error {
-	return selfs.DB.Create(data).Error
+func (baseDb *Database) Create(data interface{}) error {
+	return baseDb.db.Model(data).Create(data).Error
 }
 
-func (selfs *Database) FindAll(data interface{}) error {
-	return selfs.DB.Find(data).Error
+func (baseDb *Database) FindAll(data interface{}) error {
+	return baseDb.db.Model(data).Find(data).Error
 }
 
-func (selfs *Database) Find(query string, data interface{}, params ...interface{}) error {
-	return selfs.DB.Model(data).Where(query, params).Find(data).Error
+func (baseDb *Database) Find(query string, data interface{}, params ...interface{}) error {
+	return baseDb.db.Model(data).Where(query, params).Find(data).Error
 }
 
-func (selfs *Database) FindFirst(query string, data interface{}, params ...interface{}) error {
-	return selfs.DB.Model(data).First(data, query, params).Error
+func (baseDb *Database) FindFirst(query string, data interface{}, params ...interface{}) error {
+	return baseDb.db.Model(data).First(data, query, params).Error
 }
 
-func (selfs *Database) Update(query string, data interface{}, params ...interface{}) int64 {
-	return selfs.DB.Model(data).Where(query, params).Updates(data).RowsAffected
+func (baseDb *Database) FirstByPK(data interface{}, param interface{}) {
+	baseDb.db.First(data, param)
 }
 
-func (selfs *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
-	return selfs.DB.Unscoped().Where(query, params).Delete(data).RowsAffected
+func (baseDb *Database) Update(query string, data interface{}, params ...interface{}) int64 {
+	return baseDb.db.Model(data).Where(query, params).Updates(data).RowsAffected
 }
 
-func (selfs *Database) Count(query string, model interface{}, params ...string) int64 {
+func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
+	return baseDb.db.Unscoped().Where(query, params).Delete(data).RowsAffected
+}
+
+func (baseDb *Database) Count(query string, model interface{}, params ...string) int64 {
 	count := int64(0)
 
-	selfs.DB.
+	baseDb.db.
 		Model(&model).
 		Where(query, params).
 		Count(&count)
@@ -84,9 +84,9 @@ func (selfs *Database) Count(query string, model interface{}, params ...string) 
 	return count
 }
 
-func (selfs *Database) migrate(models ...interface{}) {
+func (baseDb *Database) migrate(models ...interface{}) {
 	for _, model := range models {
-		if err := selfs.DB.AutoMigrate(model); err != nil {
+		if err := baseDb.db.AutoMigrate(model); err != nil {
 			panic(err)
 		}
 	}

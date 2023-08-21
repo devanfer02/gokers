@@ -1,21 +1,18 @@
 package router
 
 import (
-	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/controllers"
 	"github.com/devanfer02/gokers/services"
-	"github.com/gin-gonic/gin"
 )
 
-func InitRouteCourse(router *gin.Engine, db *configs.Database) {
+func (r *Router) InitRouteCourse() {
 	courseController := controllers.CourseController{
-		Router: router,
 		Service: services.CourseService{
-			Db: db,
+			Db: r.Db,
 		},
 	}
 
-	course := courseController.Router.Group("/course")
+	course := r.Router.Group("/course")
 
 	//TODO: Make admin only
 	course.GET("/", courseController.GetCourses)

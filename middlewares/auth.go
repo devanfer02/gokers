@@ -11,7 +11,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func RequireAuth(ctx *gin.Context) {
+type AuthMiddleware struct {
+	Db *configs.Database
+}
+
+func (authMdl *AuthMiddleware) RequireAuth(ctx *gin.Context) {
 	tokenStr, err := ctx.Cookie("Authorization")
 
 	if err != nil {
@@ -33,7 +37,7 @@ func RequireAuth(ctx *gin.Context) {
 
 	var student models.Student
 
-	configs.DB.First(&student, claims["sub"])
+	authMdl.Db.FirstByPK(&student, claims["sub"])
 
 	if stdID, err := uuid.Parse(student.ID.String()); err != nil || stdID == uuid.Nil {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
@@ -44,7 +48,7 @@ func RequireAuth(ctx *gin.Context) {
 	ctx.Next()
 }
 
-func RequireAdmin(ctx *gin.Context) {
+func (authMdl *AuthMiddleware) RequireAdmin(ctx *gin.Context) {
 	tokenStr, err := ctx.Cookie("AdminAuthorization")
 
 	if err != nil {
@@ -65,7 +69,7 @@ func RequireAdmin(ctx *gin.Context) {
 
 	var admin models.Admin
 
-	configs.DB.First(&admin, claims["adm"])
+	authMdl.Db.FirstByPK(&admin, claims["adm"])
 
 	if admID, err := uuid.Parse(admin.ID.String()); err != nil || admID == uuid.Nil {
 		ctx.AbortWithStatus(http.StatusUnauthorized)

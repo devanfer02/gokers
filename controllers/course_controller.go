@@ -10,7 +10,6 @@ import (
 )
 
 type CourseController struct {
-	Router *gin.Engine
 	Service services.CourseService
 }
 
@@ -29,9 +28,13 @@ func (courseCtr *CourseController) RegisterCourse(ctx *gin.Context) {
 
 func (courseCtr *CourseController) GetCourses(ctx *gin.Context) {
 	var courses []models.Course
+	queries := make([]string, 3)
+	
+	queries[0] = ctx.Query("type")
+	queries[1] = ctx.Query("faculty")
+	queries[2] = ctx.Query("major")
 
-	typequery := ctx.Query("type")
-	response := courseCtr.Service.GetCourses(courses, typequery)
+	response := courseCtr.Service.GetCourses(courses, queries)
 
 	res.SendResponse(ctx, response)
 }

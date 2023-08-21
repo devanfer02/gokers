@@ -10,7 +10,6 @@ import (
 )
 
 type ClassController struct {
-	Router *gin.Engine
 	Service services.ClassService
 }
 

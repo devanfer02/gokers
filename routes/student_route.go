@@ -1,11 +1,11 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
+	
 )
 
-func InitRouteStudent(router *gin.Engine) {
-	Student := router.Group("/student")
+func (r *Router) InitRouteStudent() {
+	Student := r.Router.Group("/student")
 
 	Student.GET("/krs")
 }

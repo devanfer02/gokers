@@ -11,7 +11,6 @@ import (
 )
 
 type AuthController struct {
-	Router 		*gin.Engine 
 	Service 	services.AuthService
 }
 
