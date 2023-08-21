@@ -13,15 +13,15 @@ import (
 )
 
 type AuthService struct {
-	
+	Db *configs.Database
 }
 
-func (auth *AuthService) RegisterStudent(student models.Student) res.Response {
+func (authSvc *AuthService) RegisterStudent(student models.Student) res.Response {
 	if _, err := govalidator.ValidateStruct(student); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 	
-	count := helpers.DbCount("email = ?", models.Student{}, student.Email)
+	count := authSvc.Db.Count("email = ?", models.Student{}, student.Email)
 
 	if count > 0 {
 		return res.CreateResponseErr(status.Conflict, "email already in use", fmt.Errorf("email is already used"))
@@ -34,14 +34,14 @@ func (auth *AuthService) RegisterStudent(student models.Student) res.Response {
 	}
 
 	student.Password = hashed
-	student.Nim, err = helpers.CreateNIM(student.Major, student.Faculty, student.Entrance)
+	student.Nim, err = helpers.CreateNIM(student.Major, student.Faculty, student.Entrance, authSvc.Db)
 	student.ID 		 = helpers.GenerateUUID()
 
 	if err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
-	if err = configs.DB.Create(&student).Error; err != nil {
+	if err = authSvc.Db.Create(&student); err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)
 	}
 
@@ -50,14 +50,14 @@ func (auth *AuthService) RegisterStudent(student models.Student) res.Response {
 	})
 }
 
-func (auth *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Response, string) {
+func (authSvc *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Response, string) {
 	if _, err := govalidator.ValidateStruct(stdAuth); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err), ""
 	}
 
 	var student models.Student
 
-	if err := configs.DB.First(&student,"nim = ?", stdAuth.Nim).Error; err != nil {
+	if err := authSvc.Db.FindFirst("nim = ?", &student, stdAuth.Nim); err != nil {
 		return res.CreateResponseErr(status.Forbidden, "invalid nim or password", nil), ""
 	}
 
@@ -74,12 +74,12 @@ func (auth *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Response,
 	return res.CreateResponse(status.Accepted, "student successfully login", nil), token
 }
 
-func (auth *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Response {
+func (authSvc *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Response {
 	if _, err := govalidator.ValidateStruct(lecturer); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 
-	count := helpers.DbCount("email = ?", models.Lecturer{}, lecturer.Email)
+	count := authSvc.Db.Count("email = ?", models.Lecturer{}, lecturer.Email)
 
 	if count > 0 {
 		return res.CreateResponseErr(status.Conflict, "email already in use", fmt.Errorf("email is already used"))
@@ -92,14 +92,14 @@ func (auth *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Response
 	}
 
 	lecturer.Password  = hashed
-	lecturer.Ndn, err  = helpers.CreateNDN(lecturer.Major, lecturer.Faculty)
+	lecturer.Ndn, err  = helpers.CreateNDN(lecturer.Major, lecturer.Faculty, authSvc.Db)
 	lecturer.ID 	   = helpers.GenerateUUID()
 
 	if err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
-	if err = configs.DB.Create(&lecturer).Error; err != nil {
+	if err = authSvc.Db.Create(&lecturer); err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)
 	}
 

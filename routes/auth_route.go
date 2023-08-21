@@ -1,15 +1,18 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/controllers"
 	"github.com/devanfer02/gokers/services"
+	"github.com/gin-gonic/gin"
 )
 
-func InitRouteAuth(router *gin.Engine) {
+func InitRouteAuth(router *gin.Engine, db *configs.Database) {
 	authController := controllers.AuthController{
 		Router: router,
-		Service: services.AuthService{},
+		Service: services.AuthService{
+			Db: db,
+		},
 	}
 
 	authStudent := authController.Router.Group("/auth/student")

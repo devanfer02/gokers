@@ -14,7 +14,7 @@ type CourseController struct {
 	Service services.CourseService
 }
 
-func (self *CourseController) RegisterCourse(ctx *gin.Context) {
+func (courseCtr *CourseController) RegisterCourse(ctx *gin.Context) {
 	var course models.Course
 
 	if err := ctx.ShouldBindJSON(&course); err != nil {
@@ -22,21 +22,21 @@ func (self *CourseController) RegisterCourse(ctx *gin.Context) {
 		return 
 	}
 
-	response := self.Service.RegisterCourse(course)
+	response := courseCtr.Service.RegisterCourse(course)
 
 	res.SendResponse(ctx, response)
 }
 
-func (self *CourseController) GetCourses(ctx *gin.Context) {
+func (courseCtr *CourseController) GetCourses(ctx *gin.Context) {
 	var courses []models.Course
 
 	typequery := ctx.Query("type")
-	response := self.Service.GetCourses(courses, typequery)
+	response := courseCtr.Service.GetCourses(courses, typequery)
 
 	res.SendResponse(ctx, response)
 }
 
-func (self *CourseController) GetCourse(ctx *gin.Context) {
+func (courseCtr *CourseController) GetCourse(ctx *gin.Context) {
 	var course models.Course
 
 	id, err := helpers.GetParamID(ctx)
@@ -48,12 +48,12 @@ func (self *CourseController) GetCourse(ctx *gin.Context) {
 
 	course.ID = id 
 
-	response := self.Service.GetCourse(course)
+	response := courseCtr.Service.GetCourse(course)
 
 	res.SendResponse(ctx, response)
 }
 
-func (self *CourseController) UpdateCourse(ctx *gin.Context) {
+func (courseCtr *CourseController) UpdateCourse(ctx *gin.Context) {
 	var course models.Course
 
 	if err := ctx.ShouldBindJSON(&course); err != nil {
@@ -70,11 +70,23 @@ func (self *CourseController) UpdateCourse(ctx *gin.Context) {
 
 	course.ID = id 
 
-	response := self.Service.UpdateCourse(course)
+	response := courseCtr.Service.UpdateCourse(course)
 
 	res.SendResponse(ctx, response)
 }
 
-func (self *CourseController) DeleteCourse(ctx *gin.Context) {
+func (courseCtr *CourseController) DeleteCourse(ctx *gin.Context) {
+	id, err := helpers.GetParamID(ctx)
 
+	if err != nil {
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad param request", err))
+		return
+	}
+
+	var course models.Course
+	course.ID = id 
+
+	response := courseCtr.Service.DeleteService(course)
+
+	res.SendResponse(ctx, response)
 }

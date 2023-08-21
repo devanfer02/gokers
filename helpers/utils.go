@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateNIM(major, faculty, entrance string) (string, error) {
+func CreateNIM(major, faculty, entrance string, Db *configs.Database) (string, error) {
 	currentYear := time.Now().Year() % 100
 	twodigits	:= currentYear % 100
 	year		:= fmt.Sprintf("%02d", twodigits)
@@ -26,14 +26,14 @@ func CreateNIM(major, faculty, entrance string) (string, error) {
 
 	majorCode 	 := configs.FacultyMap[faculty][major]
 	entranceCode := determineEntranceCode(entrance)
-	lastCode     := determineLastCode("major = ? AND entrance = ?", models.Student{}, major, entrance)
+	lastCode     := determineLastCode("major = ? AND entrance = ?", models.Student{}, Db, major, entrance)
 
 	nim := year + facultyCode + majorCode + entranceCode + lastCode
 
 	return nim, nil
 }
 
-func CreateNDN(major, faculty string) (string, error) {
+func CreateNDN(major, faculty string, Db *configs.Database) (string, error) {
 	yearCode 	:= fmt.Sprintf("%02d", (time.Now().Year() % 100))
 
 	facultyCode := configs.FacultyMap[faculty]["code"]
@@ -43,7 +43,7 @@ func CreateNDN(major, faculty string) (string, error) {
 	}
 
 	majorCode := configs.FacultyMap[faculty][major]
-	lastCode  := determineLastCode("major = ?", models.Lecturer{}, major)
+	lastCode  := determineLastCode("major = ?", models.Lecturer{}, Db, major)
 
 	nim := "00" + yearCode + facultyCode + majorCode + lastCode
 
@@ -56,19 +56,8 @@ func GenerateUUID() uuid.UUID {
 	return newUUID
 }
 
-func DbCount(query string, model interface{}, params ...string) int64 {
-	count := int64(0)
-
-	configs.DB.
-		Model(&model).
-		Where(query, params).
-		Count(&count)
-
-	return count
-}
-
-func determineLastCode(query string, model interface{}, params ...string) string {
-	count := DbCount(query, model, params...)
+func determineLastCode(query string, model interface{},  Db *configs.Database, params ...string) string {
+	count := Db.Count(query, model, params...)
 
 	if count++; count < 10 {
 		return fmt.Sprintf("00%d", count)
