@@ -62,8 +62,8 @@ func (baseDb *Database) FindFirst(query string, data interface{}, params ...inte
 	return baseDb.db.Model(data).First(data, query, params).Error
 }
 
-func (baseDb *Database) FirstByPK(data interface{}, param interface{}) {
-	baseDb.db.First(data, "id = ?", param)
+func (baseDb *Database) FirstByPK(data interface{}, param interface{}) error {
+	return baseDb.db.Model(data).First(data, "id = ?", param).Error
 }
 
 func (baseDb *Database) Update(query string, data interface{}, params ...interface{}) int64 {
@@ -72,6 +72,26 @@ func (baseDb *Database) Update(query string, data interface{}, params ...interfa
 
 func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
 	return baseDb.db.Unscoped().Where(query, params).Delete(data).RowsAffected
+}
+
+func (baseDb *Database) PreloadByPK(foreigns []string, data interface{}, params interface{}) error {
+	query := baseDb.db 
+
+	for _, foreign := range foreigns {
+		query = query.Preload(foreign)
+	}
+
+	return query.Where("id = ?", params).First(data).Error
+}
+
+func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, condition string, params ...interface{}) error {
+	query := baseDb.db 
+
+	for _, foreign := range foreigns {
+		query = query.Preload(foreign)
+	}
+
+	return query.Where(condition, params...).First(data).Error
 }
 
 func (baseDb *Database) Count(query string, model interface{}, params ...string) int64 {

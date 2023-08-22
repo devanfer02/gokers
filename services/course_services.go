@@ -35,7 +35,6 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 	}
 
 	course.ID = helpers.GenerateUUID()
-	
 
 	if err := courseSvc.Db.Create(&course); err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
@@ -116,7 +115,8 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 
 func (courseSvc *CourseService) DeleteService(course models.Course) res.Response {
 	if courseSvc.Db.Delete("id = ?", course, course.ID) == 0 {
-		return res.CreateResponseErr(status.ServerError,
+		return res.CreateResponseErr(
+			status.ServerError,
 			"failed to delete data",
 			fmt.Errorf("data didnt exist"),
 		)
