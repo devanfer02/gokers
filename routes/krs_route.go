@@ -20,6 +20,6 @@ func (r *Router) InitRouteKrs() {
 	krs := r.Router.Group("/krs")
 
 	krs.GET("/", middleware.RequireAuth, krsController.GetKrs)
-	krs.POST("/", middleware.RequireAuth, krsController.AddClass)
-	krs.DELETE("/", middleware.RequireAuth, krsController.RemoveClass)
+	krs.POST("/:classId", middleware.RequireAuth, krsController.AddClass)
+	krs.DELETE("/:classId", middleware.RequireAuth, krsController.RemoveClass)
 }

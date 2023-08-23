@@ -54,6 +54,10 @@ func (baseDb *Database) FindAll(data interface{}) error {
 	return baseDb.db.Model(data).Find(data).Error
 }
 
+func (baseDb *Database) FindAllCondition(query string, data interface{}, params ...interface{}) error {
+	return baseDb.db.Model(data).Where(query, params).Find(data).Error
+}
+
 func (baseDb *Database) Find(query string, data interface{}, params ...interface{}) error {
 	return baseDb.db.Model(data).Where(query, params).Find(data).Error
 }
@@ -72,6 +76,18 @@ func (baseDb *Database) Update(query string, data interface{}, params ...interfa
 
 func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
 	return baseDb.db.Unscoped().Where(query, params).Delete(data).RowsAffected
+}
+
+func (baseDb *Database) PreloadChainByPK(foreigns []string, data interface{}, params interface{}) error {
+	chainedForeign := ""
+	for i, foreign := range foreigns {
+		chainedForeign += foreign
+		if i != len(foreigns) - 1 {
+			chainedForeign += "."
+		}
+	}
+
+	return baseDb.db.Preload(chainedForeign).Where("id = ?", params).First(data).Error; 
 }
 
 func (baseDb *Database) PreloadByPK(foreigns []string, data interface{}, params interface{}) error {

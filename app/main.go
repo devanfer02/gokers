@@ -15,11 +15,13 @@ func main() {
 		panic(err)
 	}
 
-	app := gin.Default()
-	db := &configs.Database{}
+	app 		:= gin.Default()
+	db 			:= &configs.Database{}
+	authMdlwr 	:= &middlewares.AuthMiddleware{Db: db}
 	router := router.Router{
 		Router: app, 
 		Db: db,
+		AuthMdlwr: authMdlwr,
 	}
 
 	db.ConnectToDB()

@@ -8,8 +8,8 @@
 
 ### Student
 1. ##### Register Student 
-    endpoint : ```/auth/student/register```    
-    method : ```POST METHOD```
+    endpoint : ```/auth/student/register```     
+    method : ```POST METHOD```        
     json body request : 
     ``` 
     {
@@ -70,10 +70,24 @@
     method :  ```POST METHOD```      
     json body request : 
     ```
+    {
+        "name": "Devan",
+        "email": "dvn@ub.ac.id",
+        "password": "abcd12345",
+        "major": "Teknik Informatika",
+        "faculty": "FILKOM"
+    }
     ```
     json response : 
     ```
-
+    {
+        "status": "success",
+        "code": 200,
+        "message": "student registered to system",
+        "data": {
+            "ndn": "002351501001"
+        }
+    }
     ```
 
 ### Course

@@ -16,7 +16,7 @@ type ClassService struct {
 	Db *configs.Database
 }
 
-func (classSvc *ClassService) GetClasses (class []models.Class, queries []string) res.Response {
+func (classSvc *ClassService) GetClasses(class []models.Class, queries []string) res.Response {
 	var err error 
 
 	if queries[0] != "" {
@@ -37,7 +37,7 @@ func (classSvc *ClassService) GetClasses (class []models.Class, queries []string
 	return res.CreateResponse(status.Ok, "successfully fetch classes", class)
 }
 
-func (classSvc *ClassService) GetClass (class models.Class) res.Response {
+func (classSvc *ClassService) GetClass(class models.Class) res.Response {
 	if err := classSvc.Db.PreloadByPK([]string{"Course","Lecturer"}, &class, class.ID); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "foreign entity assosiated not found body", err)
 	}

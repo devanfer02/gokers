@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+func GetTotalSks(krs []models.KRS) uint {
+	sum := uint(0)
+	for _, class := range krs {
+		sum += class.Sks 
+	}
+
+	return sum 
+}
+
 func CheckTypeExist(types, faculty, major *string) error {
 	if *types != "university" && *types != "faculty" && *types != "major" {
 		return fmt.Errorf("types must at least be university or faculty or major, requested types: %s", *types)

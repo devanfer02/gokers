@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/devanfer02/gokers/controllers"
-	"github.com/devanfer02/gokers/middlewares"
 	"github.com/devanfer02/gokers/services"
 )
 
@@ -13,15 +12,11 @@ func (r *Router) InitRouteCourse() {
 		},
 	}
 
-	middleware := middlewares.AuthMiddleware{
-		Db: r.Db,
-	}
-
 	course := r.Router.Group("/course")
 
-	course.GET("/",courseController.GetCourses)
-	course.GET("/:id", courseController.GetCourse)
-	course.POST("/", middleware.RequireAdmin, courseController.RegisterCourse)
-	course.PATCH("/:id", middleware.RequireAdmin, courseController.UpdateCourse)
-	course.DELETE("/:id", middleware.RequireAdmin, courseController.DeleteCourse)
+	course.GET("/", r.AuthMdlwr.RequireAdmin, courseController.GetCourses)
+	course.GET("/:id", r.AuthMdlwr.RequireAdmin, courseController.GetCourse)
+	course.POST("/", r.AuthMdlwr.RequireAdmin, courseController.RegisterCourse)
+	course.PATCH("/:id", r.AuthMdlwr.RequireAdmin, courseController.UpdateCourse)
+	course.DELETE("/:id", r.AuthMdlwr.RequireAdmin, courseController.DeleteCourse)
 }
