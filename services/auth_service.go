@@ -16,6 +16,10 @@ type AuthService struct {
 	Db *configs.Database
 }
 
+func NewAuthService(db *configs.Database) *AuthService {
+	return &AuthService{Db: db}
+}
+
 func (authSvc *AuthService) RegisterStudent(student models.Student) res.Response {
 	if _, err := govalidator.ValidateStruct(student); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)

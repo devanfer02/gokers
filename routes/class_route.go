@@ -6,17 +6,14 @@ import (
 )
 
 func (r *Router) InitRouteClass() {
-	classController := controllers.ClassController{
-		Service: services.ClassService{
-			Db: r.Db,
-		},
-	}
+	classSvc := services.NewClassService(r.Db)
+	classCtr := controllers.NewClassController(classSvc)
 
 	class := r.Router.Group("/class")
 
-	class.GET("/", r.AuthMdlwr.RequireAuth, classController.GetClasses)
-	class.GET("/:id", r.AuthMdlwr.RequireAuth, classController.GetClass)
-	class.POST("/", r.AuthMdlwr.RequireAdmin, classController.RegisterClass)
-	class.PATCH("/:id", r.AuthMdlwr.RequireAdmin, classController.UpdateClass)
-	class.DELETE("/:id", r.AuthMdlwr.RequireAdmin, classController.DeleteClass)
+	class.GET("/", r.AuthMdlwr.RequireAuth, classCtr.GetClasses)
+	class.GET("/:id", r.AuthMdlwr.RequireAuth, classCtr.GetClass)
+	class.POST("/", r.AuthMdlwr.RequireAdmin, classCtr.RegisterClass)
+	class.PATCH("/:id", r.AuthMdlwr.RequireAdmin, classCtr.UpdateClass)
+	class.DELETE("/:id", r.AuthMdlwr.RequireAdmin, classCtr.DeleteClass)
 }

@@ -10,7 +10,11 @@ import (
 )
 
 type ClassController struct {
-	Service services.ClassService
+	Service *services.ClassService
+}
+
+func NewClassController(classSvc *services.ClassService) *ClassController {
+	return &ClassController{Service: classSvc}
 }
 
 func (classCtr *ClassController) GetClasses(ctx *gin.Context) {

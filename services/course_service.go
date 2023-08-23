@@ -16,6 +16,10 @@ type CourseService struct {
 	Db *configs.Database
 }
 
+func NewCourseService(db *configs.Database) *CourseService {
+	return &CourseService{Db : db}
+}
+
 func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Response {
 	if _, err := govalidator.ValidateStruct(course); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)

@@ -7,11 +7,8 @@ import (
 )
 
 func (r *Router) InitRouteKrs() {
-	krsController := controllers.KrsController{
-		Service: services.KrsService{
-			Db: r.Db, 
-		}, 
-	}
+	krsSvc := services.NewKrsService(r.Db)
+	krsCtr := controllers.NewKrsController(krsSvc)
 
 	middleware := middlewares.AuthMiddleware{
 		Db: r.Db, 
@@ -19,7 +16,7 @@ func (r *Router) InitRouteKrs() {
 
 	krs := r.Router.Group("/krs")
 
-	krs.GET("/", middleware.RequireAuth, krsController.GetKrs)
-	krs.POST("/:classId", middleware.RequireAuth, krsController.AddClass)
-	krs.DELETE("/:classId", middleware.RequireAuth, krsController.RemoveClass)
+	krs.GET("/", middleware.RequireAuth, krsCtr.GetKrs)
+	krs.POST("/:classId", middleware.RequireAuth, krsCtr.AddClass)
+	krs.DELETE("/:classId", middleware.RequireAuth, krsCtr.RemoveClass)
 }

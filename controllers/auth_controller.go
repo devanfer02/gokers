@@ -11,7 +11,11 @@ import (
 )
 
 type AuthController struct {
-	Service 	services.AuthService
+	Service 	*services.AuthService
+}
+
+func NewAuthController(authSvc *services.AuthService) *AuthController {
+	return &AuthController{ Service: authSvc }
 }
 
 func (authCtr *AuthController) RegisterStudent(ctx *gin.Context) {

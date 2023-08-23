@@ -17,6 +17,10 @@ type KrsService struct {
 	Db *configs.Database
 }
 
+func NewKrsService(db *configs.Database) *KrsService {
+	return &KrsService{Db: db}
+}
+
 func (krsSvc *KrsService) GetKrs(krs []models.KRS, params ...interface{}) res.Response {
 	if err := krsSvc.Db.FindAllCondition("student_id = ?", &krs, params); err != nil {
 		return res.CreateResponseErr(

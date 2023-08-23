@@ -10,7 +10,11 @@ import (
 )
 
 type KrsController struct {
-	Service services.KrsService
+	Service *services.KrsService
+}
+
+func NewKrsController(krsSvc *services.KrsService) *KrsController {
+	return &KrsController{Service: krsSvc}
 }
 
 func (krsCtr *KrsController) GetKrs(ctx *gin.Context) {

@@ -6,17 +6,14 @@ import (
 )
 
 func (r *Router) InitRouteCourse() {
-	courseController := controllers.CourseController{
-		Service: services.CourseService{
-			Db: r.Db,
-		},
-	}
+	courseSvc := services.NewCourseService(r.Db)
+	courseCtr := controllers.NewCourseController(courseSvc)
 
 	course := r.Router.Group("/course")
 
-	course.GET("/", r.AuthMdlwr.RequireAdmin, courseController.GetCourses)
-	course.GET("/:id", r.AuthMdlwr.RequireAdmin, courseController.GetCourse)
-	course.POST("/", r.AuthMdlwr.RequireAdmin, courseController.RegisterCourse)
-	course.PATCH("/:id", r.AuthMdlwr.RequireAdmin, courseController.UpdateCourse)
-	course.DELETE("/:id", r.AuthMdlwr.RequireAdmin, courseController.DeleteCourse)
+	course.GET("/", r.AuthMdlwr.RequireAdmin, courseCtr.GetCourses)
+	course.GET("/:id", r.AuthMdlwr.RequireAdmin, courseCtr.GetCourse)
+	course.POST("/", r.AuthMdlwr.RequireAdmin, courseCtr.RegisterCourse)
+	course.PATCH("/:id", r.AuthMdlwr.RequireAdmin, courseCtr.UpdateCourse)
+	course.DELETE("/:id", r.AuthMdlwr.RequireAdmin, courseCtr.DeleteCourse)
 }

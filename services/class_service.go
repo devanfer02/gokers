@@ -16,6 +16,10 @@ type ClassService struct {
 	Db *configs.Database
 }
 
+func NewClassService(db *configs.Database) *ClassService {
+	return &ClassService{Db : db}
+}
+
 func (classSvc *ClassService) GetClasses(class []models.Class, queries []string) res.Response {
 	var err error 
 

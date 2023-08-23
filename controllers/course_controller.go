@@ -10,7 +10,11 @@ import (
 )
 
 type CourseController struct {
-	Service services.CourseService
+	Service *services.CourseService
+}
+
+func NewCourseController(courseSvc *services.CourseService) *CourseController {
+	return &CourseController{Service: courseSvc}
 }
 
 func (courseCtr *CourseController) RegisterCourse(ctx *gin.Context) {
