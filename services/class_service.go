@@ -20,15 +20,24 @@ func NewClassService(db *configs.Database) *ClassService {
 	return &ClassService{Db : db}
 }
 
-func (classSvc *ClassService) GetClasses(class []models.Class, queries []string) res.Response {
+func (classSvc *ClassService) GetClasses(classes *[]models.Class, queries []string, student *models.Student, ok bool) res.Response {
 	var err error 
 
 	if queries[0] != "" {
-		err = classSvc.Db.PreloadByCondition([]string{"Course", "Lecturer"}, &class, "course_code = ?", queries[0]);
-	} else if queries[1] != "" {
-		err = classSvc.Db.PreloadByCondition([]string{"Course", "Lecturer"}, &class, "major = ?", queries[1]);
+		err = classSvc.Db.PreloadByCondition([]string{"Course", "Lecturer"}, classes, "course_code = ?", queries[0]);
 	} else {
-		err = classSvc.Db.FindAll(&class);
+		err = classSvc.Db.PreloadMany([]string{"Course", "Lecturer"}, classes);
+	}
+
+	if ok {
+		var filtered []models.Class 
+		for _, class := range *classes {
+			if class.Course.Major == student.Major {
+				filtered = append(filtered, class)
+			}
+		}
+
+		*classes = filtered
 	}
 
 	if err != nil {
@@ -38,22 +47,26 @@ func (classSvc *ClassService) GetClasses(class []models.Class, queries []string)
 		)
 	}
 
-	return res.CreateResponse(status.Ok, "successfully fetch classes", class)
+	return res.CreateResponse(status.Ok, "successfully fetch classes", classes)
 }
 
-func (classSvc *ClassService) GetClass(class models.Class) res.Response {
-	if err := classSvc.Db.PreloadByPK([]string{"Course","Lecturer"}, &class, class.ID); err != nil {
+func (classSvc *ClassService) GetClass(class *models.Class, student *models.Student, ok bool) res.Response {
+	if err := classSvc.Db.PreloadByPK([]string{"Course","Lecturer"}, class, class.ID); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "foreign entity assosiated not found body", err)
 	}
 
-	return res.CreateResponse(status.Ok, "test", nil)
+	if ok && class.Course.Major != student.Major {
+		return res.CreateResponseErr(status.NotFound, "class not found", nil)
+	}
+
+	return res.CreateResponse(status.Ok, "succesfully fetch class", class)
 }
 
-func (classSvc *ClassService) RegisterClass(class models.Class) res.Response {
+func (classSvc *ClassService) RegisterClass(class *models.Class) res.Response {
 	var course models.Course
 	var lecturer models.Lecturer
 
-	if _, err := govalidator.ValidateStruct(&class); err != nil {
+	if _, err := govalidator.ValidateStruct(class); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 
@@ -65,13 +78,13 @@ func (classSvc *ClassService) RegisterClass(class models.Class) res.Response {
 		return res.CreateResponseErr(status.NotFound, "course_id not found", err)
 	}
 
-	if err := classSvc.Db.FirstByPK(&lecturer, class.LecturerID); err != nil {
+	if err := classSvc.Db.FirstByPK(&lecturer, class.LecturerID); err != nil { 
 		return res.CreateResponseErr(status.NotFound, "lecturer_id not found", err)
 	}
 
 	class.ID = helpers.GenerateUUID()
 
-	if err := classSvc.Db.Create(&class); err != nil {
+	if err := classSvc.Db.Create(class); err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal sever error", err)
 	}
 
@@ -80,12 +93,12 @@ func (classSvc *ClassService) RegisterClass(class models.Class) res.Response {
 	})
 }
 
-func (classSvc *ClassService) UpdateClass(class models.Class) res.Response {
+func (classSvc *ClassService) UpdateClass(class *models.Class) res.Response {
 	if _, err := govalidator.ValidateStruct(class); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 
-	if classSvc.Db.Update("id = ?", &class, class.ID) == 0 {
+	if classSvc.Db.Update("id = ?", class, class.ID) == 0 {
 		return res.CreateResponseErr(
 			status.ServerError, 
 			"failed to update data",
@@ -93,12 +106,12 @@ func (classSvc *ClassService) UpdateClass(class models.Class) res.Response {
 		)
 	}
 
-	return res.CreateResponse(status.Ok, "class data update", gin.H {
+	return res.CreateResponse(status.Ok, "class data updated", gin.H {
 		"record_data": class, 
 	})
 }
 
-func (classSvc *ClassService) DeleteClass(class models.Class) res.Response {
+func (classSvc *ClassService) DeleteClass(class *models.Class) res.Response {
 	if classSvc.Db.Delete("id = ?", class, class.ID) == 0 {
 		return res.CreateResponseErr(
 			status.ServerError,
@@ -107,7 +120,5 @@ func (classSvc *ClassService) DeleteClass(class models.Class) res.Response {
 		)
 	}
 
-	return res.CreateResponse(status.Ok, "successfully delete class", gin.H {
-		"deleted_record_data": class,
-	})
+	return res.CreateResponse(status.Ok, "successfully delete class", nil)
 }

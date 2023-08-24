@@ -13,7 +13,9 @@ func (r *Router) InitRouteClass() {
 
 	class.GET("/", r.AuthMdlwr.RequireAuth, classCtr.GetClasses)
 	class.GET("/:id", r.AuthMdlwr.RequireAuth, classCtr.GetClass)
-	class.POST("/", r.AuthMdlwr.RequireAdmin, classCtr.RegisterClass)
-	class.PATCH("/:id", r.AuthMdlwr.RequireAdmin, classCtr.UpdateClass)
-	class.DELETE("/:id", r.AuthMdlwr.RequireAdmin, classCtr.DeleteClass)
+	class.GET("/admin", r.AuthMdlwr.RequireAdmin, classCtr.GetClasses)
+	class.GET("/admin/:id", r.AuthMdlwr.RequireAdmin, classCtr.GetClass)
+	class.POST("/register", r.AuthMdlwr.RequireAdmin, classCtr.RegisterClass)
+	class.PATCH("/update/:id", r.AuthMdlwr.RequireAdmin, classCtr.UpdateClass)
+	class.DELETE("/delete/:id", r.AuthMdlwr.RequireAdmin, classCtr.DeleteClass)
 }

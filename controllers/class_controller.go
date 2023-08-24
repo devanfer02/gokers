@@ -18,13 +18,16 @@ func NewClassController(classSvc *services.ClassService) *ClassController {
 }
 
 func (classCtr *ClassController) GetClasses(ctx *gin.Context) {
+	studentCtx, _ := ctx.Get("std")
+
+	student, ok := studentCtx.(models.Student)
+
 	var classes []models.Class
 	queries := make([]string, 2)
 
 	queries[0] = ctx.Query("code")
-	queries[1] = ctx.Query("major")
 
-	response := classCtr.Service.GetClasses(classes, queries)
+	response := classCtr.Service.GetClasses(&classes, queries, &student, ok)
 
 	res.SendResponse(ctx, response)
 }
@@ -40,29 +43,24 @@ func (classCtr *ClassController) GetClass(ctx *gin.Context) {
 	}
 
 	class.ID = id
+	studentCtx, _ := ctx.Get("std")
 
-	response := classCtr.Service.GetClass(class)
+	student, ok := studentCtx.(models.Student)
+
+	response := classCtr.Service.GetClass(&class, &student, ok)
 
 	res.SendResponse(ctx, response)
 }
 
 func (classCtr *ClassController) RegisterClass(ctx *gin.Context) {
-	courseId, err := helpers.GetParamID(ctx)	
-
-	if err != nil {
-		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad param request", err))
-		return
-	}
-
 	var class models.Class
-	class.CourseID = courseId
 
 	if err := ctx.ShouldBindJSON(&class); err != nil {
 		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))
 		return
 	}
 
-	response := classCtr.Service.RegisterClass(class);
+	response := classCtr.Service.RegisterClass(&class);
 
 	res.SendResponse(ctx, response)
 }
@@ -84,7 +82,7 @@ func (classCtr *ClassController) UpdateClass(ctx *gin.Context) {
 
 	class.ID = id 
 
-	response := classCtr.Service.UpdateClass(class)
+	response := classCtr.Service.UpdateClass(&class)
 
 	res.SendResponse(ctx, response)
 }
@@ -100,7 +98,7 @@ func (classCtr *ClassController) DeleteClass(ctx *gin.Context) {
 	var class models.Class 
 	class.ID = id 
 
-	response := classCtr.Service.DeleteClass(class)
+	response := classCtr.Service.DeleteClass(&class)
 
 	res.SendResponse(ctx, response)	
 }

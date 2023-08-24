@@ -20,7 +20,7 @@ func NewCourseService(db *configs.Database) *CourseService {
 	return &CourseService{Db : db}
 }
 
-func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Response {
+func (courseSvc *CourseService) RegisterCourse(course *models.Course) res.Response {
 	if _, err := govalidator.ValidateStruct(course); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
@@ -40,7 +40,7 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 
 	course.ID = helpers.GenerateUUID()
 
-	if err := courseSvc.Db.Create(&course); err != nil {
+	if err := courseSvc.Db.Create(course); err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
@@ -49,11 +49,11 @@ func (courseSvc *CourseService) RegisterCourse(course models.Course) res.Respons
 	})
 }
 
-func (courseSvc *CourseService) GetCourses(course []models.Course, queries []string) res.Response {
+func (courseSvc *CourseService) GetCourses(course *[]models.Course, queries []string) res.Response {
 	var err error 
 
 	if queries[0] == "" && queries[1] == "" && queries[2] == ""{ 
-		err = courseSvc.Db.FindAll(&course);
+		err = courseSvc.Db.FindAll(course);
 	} else {
 		var query, param string
 		if queries[0] != ""  {
@@ -70,7 +70,7 @@ func (courseSvc *CourseService) GetCourses(course []models.Course, queries []str
 			param = queries[2]
 		}
 
-		err = courseSvc.Db.Find(query, &course, param)
+		err = courseSvc.Db.Find(query, course, param)
 	}
 
 	if err != nil {
@@ -83,8 +83,8 @@ func (courseSvc *CourseService) GetCourses(course []models.Course, queries []str
 	return res.CreateResponse(status.Ok, "sucessfully fetch course", course)
 }
 
-func (courseSvc *CourseService) GetCourse(course models.Course) res.Response {
-	if err := courseSvc.Db.Find("id = ?", &course, course.ID); err != nil {
+func (courseSvc *CourseService) GetCourse(course *models.Course) res.Response {
+	if err := courseSvc.Db.Find("id = ?", course, course.ID); err != nil {
 		return res.CreateResponseErr(
 			status.ServerError,
 			"internal server error",
@@ -95,7 +95,7 @@ func (courseSvc *CourseService) GetCourse(course models.Course) res.Response {
 	return res.CreateResponse(status.Ok, "sucessfully fetch course", course)
 }
 
-func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response {
+func (courseSvc *CourseService) UpdateCourse(course *models.Course) res.Response {
 	if _, err := govalidator.ValidateStruct(course); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
@@ -104,7 +104,7 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 		return res.CreateResponseErr(status.BadRequest, "types or faculty or major doesnt exist", err)
 	}	
 
-	if courseSvc.Db.Update("id = ?", &course, course.ID) == 0 {
+	if courseSvc.Db.Update("id = ?", course, course.ID) == 0 {
 		return res.CreateResponseErr(
 			status.ServerError,
 			"failed to update data",
@@ -117,7 +117,7 @@ func (courseSvc *CourseService) UpdateCourse(course models.Course) res.Response 
 	})
 }
 
-func (courseSvc *CourseService) DeleteService(course models.Course) res.Response {
+func (courseSvc *CourseService) DeleteService(course *models.Course) res.Response {
 	if courseSvc.Db.Delete("id = ?", course, course.ID) == 0 {
 		return res.CreateResponseErr(
 			status.ServerError,
@@ -126,7 +126,5 @@ func (courseSvc *CourseService) DeleteService(course models.Course) res.Response
 		)
 	}
 
-	return res.CreateResponse(status.Ok, "successfully delete course", gin.H {
-		"deleted_record_data": course,
-	})
+	return res.CreateResponse(status.Ok, "successfully delete course", nil)
 }

@@ -26,7 +26,7 @@ func (authCtr *AuthController) RegisterStudent(ctx *gin.Context) {
 		return 
 	}
 
-	response := authCtr.Service.RegisterStudent(student)
+	response := authCtr.Service.RegisterStudent(&student)
 
 	res.SendResponse(ctx, response)
 }
@@ -39,7 +39,7 @@ func (authCtr *AuthController) LoginStudent(ctx *gin.Context) {
 		return
 	}
 
-	response, token := authCtr.Service.LoginStudent(studentAuth)
+	response, token := authCtr.Service.LoginStudent(&studentAuth)
 
 	if token == "" {
 		res.SendResponse(ctx, response)
@@ -67,7 +67,7 @@ func (authCtr *AuthController) RegisterLecturer(ctx *gin.Context) {
 		return 
 	}
 
-	response := authCtr.Service.RegisterLecturer(lecturer)
+	response := authCtr.Service.RegisterLecturer(&lecturer)
 
 	res.SendResponse(ctx, response)
 }
@@ -80,7 +80,7 @@ func (authCtr *AuthController) RegisterAdmin(ctx *gin.Context) {
 		return 
 	}
 
-	response := authCtr.Service.RegisterAdmin(admin);
+	response := authCtr.Service.RegisterAdmin(&admin);
 
 	res.SendResponse(ctx, response)
 }
@@ -93,7 +93,7 @@ func (authCtr *AuthController) LoginAdmin(ctx *gin.Context) {
 		return
 	}
 
-	response, token := authCtr.Service.LoginAdmin(admin)
+	response, token := authCtr.Service.LoginAdmin(&admin)
 
 	if token == "" {
 		res.SendResponse(ctx, response)

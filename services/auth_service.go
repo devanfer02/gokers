@@ -20,7 +20,7 @@ func NewAuthService(db *configs.Database) *AuthService {
 	return &AuthService{Db: db}
 }
 
-func (authSvc *AuthService) RegisterStudent(student models.Student) res.Response {
+func (authSvc *AuthService) RegisterStudent(student *models.Student) res.Response {
 	if _, err := govalidator.ValidateStruct(student); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
@@ -45,7 +45,13 @@ func (authSvc *AuthService) RegisterStudent(student models.Student) res.Response
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
-	if err = authSvc.Db.Create(&student); err != nil {
+	krsDtl := models.NewKrsDetail(helpers.GenerateUUID(), student.ID)
+
+	if err = authSvc.Db.Create(student); err != nil {
+		return res.CreateResponseErr(status.Conflict, "internal server error", err)
+	}
+
+	if err = authSvc.Db.Create(&krsDtl); err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)
 	}
 
@@ -54,7 +60,7 @@ func (authSvc *AuthService) RegisterStudent(student models.Student) res.Response
 	})
 }
 
-func (authSvc *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Response, string) {
+func (authSvc *AuthService) LoginStudent(stdAuth *models.StudentAuth) (res.Response, string) {
 	if _, err := govalidator.ValidateStruct(stdAuth); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err), ""
 	}
@@ -78,7 +84,7 @@ func (authSvc *AuthService) LoginStudent(stdAuth models.StudentAuth) (res.Respon
 	return res.CreateResponse(status.Accepted, "student successfully login", nil), token
 }
 
-func (authSvc *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Response {
+func (authSvc *AuthService) RegisterLecturer(lecturer *models.Lecturer) res.Response {
 	if _, err := govalidator.ValidateStruct(lecturer); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
@@ -103,7 +109,7 @@ func (authSvc *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Respo
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
-	if err = authSvc.Db.Create(&lecturer); err != nil {
+	if err = authSvc.Db.Create(lecturer); err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)
 	}
 
@@ -112,7 +118,7 @@ func (authSvc *AuthService) RegisterLecturer(lecturer models.Lecturer) res.Respo
 	})
 }
 
-func (authSvc *AuthService) RegisterAdmin(admin models.Admin) res.Response {
+func (authSvc *AuthService) RegisterAdmin(admin *models.Admin) res.Response {
 	if _, err := govalidator.ValidateStruct(admin); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
@@ -139,7 +145,7 @@ func (authSvc *AuthService) RegisterAdmin(admin models.Admin) res.Response {
 	return res.CreateResponse(status.Ok, "admin registered to system", nil)
 }
 
-func (authSvc *AuthService) LoginAdmin(adminAuth models.Admin) (res.Response, string) {
+func (authSvc *AuthService) LoginAdmin(adminAuth *models.Admin) (res.Response, string) {
 	if _, err := govalidator.ValidateStruct(adminAuth); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err), ""
 	}

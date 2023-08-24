@@ -16,13 +16,9 @@ func main() {
 	}
 
 	app 		:= gin.Default()
-	db 			:= &configs.Database{}
-	authMdlwr 	:= &middlewares.AuthMiddleware{Db: db}
-	router := router.Router{
-		Router: app, 
-		Db: db,
-		AuthMdlwr: authMdlwr,
-	}
+	db 			:= configs.NewDatabase()
+	authMdlwr 	:= middlewares.NewAuthMiddleware(db)
+	router 		:= router.NewRouter(app,db,authMdlwr)
 
 	db.ConnectToDB()
 	db.MigrateDB()
@@ -33,6 +29,7 @@ func main() {
 
 	router.InitRouteAuth()
 	router.InitRouteCourse()
+	router.InitRouteClass()
 
 	app.Run(os.Getenv("APP_PORT"))
 }

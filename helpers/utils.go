@@ -108,7 +108,7 @@ func GenerateUUID() uuid.UUID {
 	return newUUID
 }
 
-func determineLastCode(query string, model interface{},  Db *configs.Database, params ...string) string {
+func determineLastCode(query string, model interface{},  Db *configs.Database, params ...interface{}) string {
 	count := Db.Count(query, model, params...)
 
 	if count++; count < 10 {

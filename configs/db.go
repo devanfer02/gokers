@@ -13,6 +13,10 @@ type Database struct {
 	db *gorm.DB 
 }
 
+func NewDatabase() *Database {
+	return &Database{}
+}
+
 func (baseDb *Database) ConnectToDB() {
 	dsn := fmt.Sprintf(
 		"%s%s:@tcp(%s)/%s?parseTime=true", 
@@ -38,12 +42,16 @@ func (baseDb *Database) MigrateDB() {
 
 	baseDb.migrate(
 		&models.Student{},
+		&models.Lecturer{},
 		&models.Course{},
 		&models.Class{},
 		&models.KRS{},
-		&models.Lecturer{},
 		&models.Admin{},
+		&models.KrsDetail{},
+		&models.CoursePrequisites{},
 	)
+
+	baseDb.db.Model(&models.Class{})
 }
 
 func (baseDb *Database) Create(data interface{}) error {
@@ -100,6 +108,16 @@ func (baseDb *Database) PreloadByPK(foreigns []string, data interface{}, params 
 	return query.Where("id = ?", params).First(data).Error
 }
 
+func (baseDb *Database) PreloadMany(foreigns []string, data interface{}) error {
+	query := baseDb.db 
+
+	for _, foreign := range foreigns {
+		query = query.Preload(foreign)
+	}
+
+	return query.Find(data).Error
+}
+
 func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, condition string, params ...interface{}) error {
 	query := baseDb.db 
 
@@ -110,12 +128,12 @@ func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, 
 	return query.Where(condition, params...).First(data).Error
 }
 
-func (baseDb *Database) Count(query string, model interface{}, params ...string) int64 {
+func (baseDb *Database) Count(query string, model interface{}, params ...interface{}) int64 {
 	count := int64(0)
 
 	baseDb.db.
 		Model(&model).
-		Where(query, params).
+		Where(query, params...).
 		Count(&count)
 
 	return count

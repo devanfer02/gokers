@@ -4,7 +4,7 @@
 1. [Student](#student)
 2. [Lecturer](#lecturer)
 3. [Course](#course)
-4. Krs
+4. [Class](#class)
 
 ### Student
 1. ##### Register Student 
@@ -320,25 +320,12 @@
         "status": "success",
         "code": 200,
         "message": "successfully delete course",
-        "data": {
-            "deleted_record_data": {
-                "id": "ddb386f0-a132-4e12-8d72-b6f99a986318",
-                "created_at": "0001-01-01T00:00:00Z",
-                "updated_at": "0001-01-01T00:00:00Z",
-                "name": "",
-                "code": "",
-                "sks": 0,
-                "type": "",
-                "faculty": "",
-                "major": ""
-            }
-        }
     }
     ```
 
 6. ##### Get Courses By Param
     endpoint : ```/course?type={}&faculty={}&major={}```       
-    method : ```GET```
+    method : ```GET METHOD```
     params :   
     1. type : must be string, 3 types, university or faculty or major
     2. faculty : must be string
@@ -374,5 +361,293 @@
                 "major": "Pendidikan Teknologi Informasi"
             }
         ]
+    }
+    ```
+
+### Class
+1. ##### Register Class
+    endpoint : ```/class/register```     
+    method : ```POST METHOD```       
+    json body request : 
+    ```
+    {
+        "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+        "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+        "class_name": "A Teknik Informatika",
+        "class_room": "TIF06 - F2.9"
+    }
+    ```
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "class registered to system",
+        "data": {
+            "record_data": {
+                "id": "ba96d378-7906-4461-8b13-effca58639ad",
+                "created_at": "2023-08-25T01:02:05.122+07:00",
+                "updated_at": "2023-08-25T01:02:05.122+07:00",
+                "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "class_name": "A Teknik Informatika",
+                "class_room": "TIF06 - F2.9",
+                "quota": 40
+            }
+        }
+    }
+    ```
+
+2. ##### Update Class
+    endpoint : ```/class/update/{id}```        
+    method : ```PATCH METHOD```     
+    json body request : 
+    ```
+    {
+        "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+        "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+        "class_name": "A Teknik Informatika",
+        "class_room": "TIF06 - F2.9",
+        "quota": 38
+    }
+    ```
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "class data update",
+        "data": {
+            "record_data": {
+                "id": "ba96d378-7906-4461-8b13-effca58639ad",
+                "created_at": "0001-01-01T00:00:00Z",
+                "updated_at": "2023-08-25T01:12:24.216+07:00",
+                "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "class_name": "A Teknik Informatika",
+                "class_room": "TIF06 - F2.9",
+                "quota": 38
+            }
+        }
+    }
+    ```
+
+3. ##### Delete Class      
+    endpoint : ```/class/delete/{id}```      
+    method : ```DELETE METHOD```       
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "successfully delete class"
+    }
+    ```
+
+4. ##### Get Classes Student Entity    
+    endpoint : ```/class```      
+    method : ```GET METHOD```      
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "successfully fetch classes",
+        "data": [
+            {
+                "id": "07b086bb-36ee-42ad-9610-05048c4de6bd",
+                "created_at": "2023-08-24T18:44:57.122Z",
+                "updated_at": "2023-08-24T18:44:57.122Z",
+                "course_info": {
+                    "id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                    "created_at": "2023-08-24T03:47:07.492Z",
+                    "updated_at": "2023-08-24T04:13:18.635Z",
+                    "name": "Pemrograman Dasar",
+                    "code": "CIF62001",
+                    "sks": 5,
+                    "type": "major",
+                    "faculty": "FILKOM",
+                    "major": "Teknik Informatika",
+                    "upper": {
+                        "id": "00000000-0000-0000-0000-000000000000",
+                        "created_at": "0001-01-01T00:00:00Z",
+                        "updated_at": "0001-01-01T00:00:00Z",
+                        "course_id": "",
+                        "prequisite_id": ""
+                    }
+                },
+                "lecturer_info": {
+                    "id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                    "created_at": "2023-08-24T17:47:49.645Z",
+                    "updated_at": "2023-08-24T17:47:49.645Z",
+                    "name": "Devan",
+                    "ndn": "002351501001",
+                    "email": "dvn@ub.ac.id",
+                    "password": "$2a$10$QrMkWwgaJNf81njJ8ukewejddxFWihIDGCi5.ROgD/BCg3lRnOnSm",
+                    "faculty": "FILKOM",
+                    "major": "Teknik Informatika",
+                    "Class": null
+                },
+                "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "class_name": "A Teknik Informatika",
+                "class_room": "TIF06 - F2.9",
+                "quota": 40
+            }
+        ]
+    }
+    ```
+
+5. ##### Get Classes Admin Entity   
+    endpoint : ```/class/admin```        
+    method : ```GET METHOD```       
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "successfully fetch classes",
+        "data": [
+            {
+                "id": "04f045a9-b589-4106-becb-7f9523fa6db1",
+                "created_at": "2023-08-24T18:45:43.209Z",
+                "updated_at": "2023-08-24T18:45:43.209Z",
+                "course_info": {
+                    "id": "4a58050f-90fa-4ade-94fc-833203af1030",
+                    "created_at": "2023-08-24T03:50:05.787Z",
+                    "updated_at": "2023-08-24T03:50:05.787Z",
+                    "name": "Pemrograman Dasar",
+                    "code": "CIT62001",
+                    "sks": 4,
+                    "type": "major",
+                    "faculty": "FILKOM",
+                    "major": "Teknologi Informasi",
+                    "upper": {
+                        "id": "00000000-0000-0000-0000-000000000000",
+                        "created_at": "0001-01-01T00:00:00Z",
+                        "updated_at": "0001-01-01T00:00:00Z",
+                        "course_id": "",
+                        "prequisite_id": ""
+                    }
+                },
+                "lecturer_info": {
+                    "id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                    "created_at": "2023-08-24T17:47:49.645Z",
+                    "updated_at": "2023-08-24T17:47:49.645Z",
+                    "name": "Devan",
+                    "ndn": "002351501001",
+                    "email": "dvn@ub.ac.id",
+                    "password": "$2a$10$QrMkWwgaJNf81njJ8ukewejddxFWihIDGCi5.ROgD/BCg3lRnOnSm",
+                    "faculty": "FILKOM",
+                    "major": "Teknik Informatika",
+                    "Class": null
+                },
+                "course_id": "4a58050f-90fa-4ade-94fc-833203af1030",
+                "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "class_name": "D Teknologi Informasi",
+                "class_room": "TIF06 - F3.9",
+                "quota": 40
+            },
+            {
+                "id": "07b086bb-36ee-42ad-9610-05048c4de6bd",
+                "created_at": "2023-08-24T18:44:57.122Z",
+                "updated_at": "2023-08-24T18:44:57.122Z",
+                "course_info": {
+                    "id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                    "created_at": "2023-08-24T03:47:07.492Z",
+                    "updated_at": "2023-08-24T04:13:18.635Z",
+                    "name": "Pemrograman Dasar",
+                    "code": "CIF62001",
+                    "sks": 5,
+                    "type": "major",
+                    "faculty": "FILKOM",
+                    "major": "Teknik Informatika",
+                    "upper": {
+                        "id": "00000000-0000-0000-0000-000000000000",
+                        "created_at": "0001-01-01T00:00:00Z",
+                        "updated_at": "0001-01-01T00:00:00Z",
+                        "course_id": "",
+                        "prequisite_id": ""
+                    }
+                },
+                "lecturer_info": {
+                    "id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                    "created_at": "2023-08-24T17:47:49.645Z",
+                    "updated_at": "2023-08-24T17:47:49.645Z",
+                    "name": "Devan",
+                    "ndn": "002351501001",
+                    "email": "dvn@ub.ac.id",
+                    "password": "$2a$10$QrMkWwgaJNf81njJ8ukewejddxFWihIDGCi5.ROgD/BCg3lRnOnSm",
+                    "faculty": "FILKOM",
+                    "major": "Teknik Informatika",
+                    "Class": null
+                },
+                "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "class_name": "A Teknik Informatika",
+                "class_room": "TIF06 - F2.9",
+                "quota": 40
+            }
+        ]
+    }
+    ```
+
+6. ##### Get Class By ID Student Entity
+    endpoint : ```/class/{id}```       
+    method : ```GET METHOD```        
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "succesfully fetch class",
+        "data": {
+            "id": "07b086bb-36ee-42ad-9610-05048c4de6bd",
+            "created_at": "2023-08-24T18:44:57.122Z",
+            "updated_at": "2023-08-24T18:44:57.122Z",
+            "course_info": {
+                "id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+                "created_at": "2023-08-24T03:47:07.492Z",
+                "updated_at": "2023-08-24T04:13:18.635Z",
+                "name": "Pemrograman Dasar",
+                "code": "CIF62001",
+                "sks": 5,
+                "type": "major",
+                "faculty": "FILKOM",
+                "major": "Teknik Informatika",
+                "upper": {
+                    "id": "00000000-0000-0000-0000-000000000000",
+                    "created_at": "0001-01-01T00:00:00Z",
+                    "updated_at": "0001-01-01T00:00:00Z",
+                    "course_id": "",
+                    "prequisite_id": ""
+                }
+            },
+            "lecturer_info": {
+                "id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+                "created_at": "2023-08-24T17:47:49.645Z",
+                "updated_at": "2023-08-24T17:47:49.645Z",
+                "name": "Devan",
+                "ndn": "002351501001",
+                "email": "dvn@ub.ac.id",
+                "password": "$2a$10$QrMkWwgaJNf81njJ8ukewejddxFWihIDGCi5.ROgD/BCg3lRnOnSm",
+                "faculty": "FILKOM",
+                "major": "Teknik Informatika",
+                "Class": null
+            },
+            "course_id": "1ab02384-f491-4b7b-85de-ff64ee2c6d61",
+            "lecturer_id": "cdb5ac3b-3ff0-4226-bb86-a6a03947d5c6",
+            "class_name": "A Teknik Informatika",
+            "class_room": "TIF06 - F2.9",
+            "quota": 40
+        }
+    }
+    ```
+    json response if class.course.major is not same as student.major : 
+    ```
+    {
+        "status": "error",
+        "code": 404,
+        "message": "class not found"
     }
     ```

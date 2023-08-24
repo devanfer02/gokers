@@ -15,6 +15,12 @@ type AuthMiddleware struct {
 	Db *configs.Database
 }
 
+func NewAuthMiddleware(db *configs.Database) *AuthMiddleware {
+	return &AuthMiddleware{
+		Db: db,
+	}
+}
+
 func (authMdl *AuthMiddleware) RequireAuth(ctx *gin.Context) {
 	tokenStr, err := ctx.Cookie("Authorization")
 
@@ -72,7 +78,6 @@ func (authMdl *AuthMiddleware) RequireAdmin(ctx *gin.Context) {
 	authMdl.Db.FirstByPK(&admin, claims["adm"])
 
 	if admID, err := uuid.Parse(admin.ID.String()); err != nil || admID == uuid.Nil {
-		// berhenti disini
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return 
 	}

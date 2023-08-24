@@ -25,7 +25,7 @@ func (courseCtr *CourseController) RegisterCourse(ctx *gin.Context) {
 		return 
 	}
 
-	response := courseCtr.Service.RegisterCourse(course)
+	response := courseCtr.Service.RegisterCourse(&course)
 
 	res.SendResponse(ctx, response)
 }
@@ -38,7 +38,7 @@ func (courseCtr *CourseController) GetCourses(ctx *gin.Context) {
 	queries[1] = ctx.Query("faculty")
 	queries[2] = ctx.Query("major")
 
-	response := courseCtr.Service.GetCourses(courses, queries)
+	response := courseCtr.Service.GetCourses(&courses, queries)
 
 	res.SendResponse(ctx, response)
 }
@@ -55,7 +55,7 @@ func (courseCtr *CourseController) GetCourse(ctx *gin.Context) {
 
 	course.ID = id 
 
-	response := courseCtr.Service.GetCourse(course)
+	response := courseCtr.Service.GetCourse(&course)
 
 	res.SendResponse(ctx, response)
 }
@@ -77,7 +77,7 @@ func (courseCtr *CourseController) UpdateCourse(ctx *gin.Context) {
 
 	course.ID = id 
 
-	response := courseCtr.Service.UpdateCourse(course)
+	response := courseCtr.Service.UpdateCourse(&course)
 
 	res.SendResponse(ctx, response)
 }
@@ -93,7 +93,7 @@ func (courseCtr *CourseController) DeleteCourse(ctx *gin.Context) {
 	var course models.Course
 	course.ID = id 
 
-	response := courseCtr.Service.DeleteService(course)
+	response := courseCtr.Service.DeleteService(&course)
 
 	res.SendResponse(ctx, response)
 }
