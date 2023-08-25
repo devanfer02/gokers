@@ -82,8 +82,16 @@ func (baseDb *Database) Update(query string, data interface{}, params ...interfa
 	return baseDb.db.Model(data).Where(query, params).Updates(data).RowsAffected
 }
 
+func (baseDb *Database) UpdateByPK(data interface{}, param interface{}) int64 {
+	return baseDb.db.Model(data).Where("id = ?", param).Updates(data).RowsAffected
+}
+
 func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
 	return baseDb.db.Unscoped().Where(query, params).Delete(data).RowsAffected
+}
+
+func (baseDb *Database) DeleteByPK(data interface{}, params ...interface{}) int64 {
+	return baseDb.db.Unscoped().Where("id = ?", params).Delete(data).RowsAffected
 }
 
 func (baseDb *Database) PreloadChainByPK(foreigns []string, data interface{}, params interface{}) error {
@@ -125,7 +133,7 @@ func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, 
 		query = query.Preload(foreign)
 	}
 
-	return query.Where(condition, params...).First(data).Error
+	return query.Where(condition, params...).Find(data).Error
 }
 
 func (baseDb *Database) Count(query string, model interface{}, params ...interface{}) int64 {

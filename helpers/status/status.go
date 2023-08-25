@@ -11,3 +11,4 @@ var Forbidden 		= http.StatusForbidden
 var Created 		= http.StatusCreated
 var Conflict		= http.StatusConflict
 var NotFound 		= http.StatusNotFound
+var TooMany			= http.StatusTooManyRequests

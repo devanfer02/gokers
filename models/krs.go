@@ -9,6 +9,7 @@ type KRS struct {
 	Semester 	string 		`gorm:"type:varchar(100)" json:"semester" valid:"type(string)"`
 	Grade 		string 		`gorm:"type:varchar(10);default:'K'" json:"grade" valid:"type(string),stringlength(1|1)"`
 	Sks 		uint		`gorm:"type:integer;not null;default:0" json:"total_sks" valid:"type(integer)"`
+	Student 	Student
 }
 
 type KrsDetail struct {

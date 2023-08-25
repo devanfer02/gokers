@@ -17,6 +17,27 @@ func NewClassController(classSvc *services.ClassService) *ClassController {
 	return &ClassController{Service: classSvc}
 }
 
+func (classCtr *ClassController) GetParticipants(ctx *gin.Context) {
+	//TODO: Get participants of class with specified ID
+	//TODO: Test this func
+	var class models.Class
+
+	id, err := helpers.GetParamID(ctx)
+
+	if err != nil {
+		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad param request", err))
+		return
+	}
+
+	studentCtx, _ := ctx.Get("std")
+	student, _ := studentCtx.(models.Student)	
+	class.ID = id 
+
+	response := classCtr.Service.GetParticipants(&class, &student)
+
+	res.SendResponse(ctx, response)
+}
+
 func (classCtr *ClassController) GetClasses(ctx *gin.Context) {
 	studentCtx, _ := ctx.Get("std")
 

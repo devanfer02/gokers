@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 	"unicode"
 
@@ -10,13 +11,20 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetTotalSks(krs []models.KRS) uint {
-	sum := uint(0)
-	for _, class := range krs {
-		sum += class.Sks 
+func GetCurrentSemester() string {
+	var semester string 
+
+	currentTime := time.Now()
+	currentYear := currentTime.Year()
+	currentMonth := int(currentTime.Month())
+
+	if currentMonth > 7 {
+		semester = "Ganjil"
+	} else {
+		semester = "Genap"
 	}
 
-	return sum 
+	return semester + " " + strconv.Itoa(currentYear)
 }
 
 func CheckTypeExist(types, faculty, major *string) error {

@@ -20,6 +20,37 @@ func NewClassService(db *configs.Database) *ClassService {
 	return &ClassService{Db : db}
 }
 
+func (classSvc *ClassService) GetParticipants(class *models.Class, student *models.Student) res.Response {
+	var krs *[]models.KRS
+	var students []models.Student
+
+	if err := classSvc.Db.FirstByPK(class, class.ID); err != nil {
+		return res.CreateResponseErr(status.NotFound, "class not found", err)
+	}
+
+	if err := classSvc.Db.PreloadByCondition([]string{"Student"}, krs, "class_id = ?" ,class.ID); err != nil {
+		return res.CreateResponseErr(status.ServerError, "internal server error", err)
+	}
+
+	forbidden := true
+
+	for _, unit := range *krs {
+		if unit.Student.ID == student.ID {
+			forbidden = false
+		}
+		students = append(students, unit.Student)
+	}
+
+	if forbidden {
+		return res.CreateResponse(status.Forbidden, "forbidden", nil)
+	}
+
+	return res.CreateResponse(status.Ok, "successfully fetch participants", gin.H {
+		"class_info": class, 
+		"participants": students,
+	})
+}
+
 func (classSvc *ClassService) GetClasses(classes *[]models.Class, queries []string, student *models.Student, ok bool) res.Response {
 	var err error 
 
@@ -27,6 +58,13 @@ func (classSvc *ClassService) GetClasses(classes *[]models.Class, queries []stri
 		err = classSvc.Db.PreloadByCondition([]string{"Course", "Lecturer"}, classes, "course_code = ?", queries[0]);
 	} else {
 		err = classSvc.Db.PreloadMany([]string{"Course", "Lecturer"}, classes);
+	}
+
+	if err != nil {
+		return res.CreateResponseErr(status.ServerError,
+			"internal server error", 
+			err,
+		)
 	}
 
 	if ok {
@@ -38,13 +76,6 @@ func (classSvc *ClassService) GetClasses(classes *[]models.Class, queries []stri
 		}
 
 		*classes = filtered
-	}
-
-	if err != nil {
-		return res.CreateResponseErr(status.ServerError,
-			"internal server error", 
-			err,
-		)
 	}
 
 	return res.CreateResponse(status.Ok, "successfully fetch classes", classes)
