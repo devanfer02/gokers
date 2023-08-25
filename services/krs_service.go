@@ -63,7 +63,7 @@ func (krsSvc *KrsService) AddClass(krs *models.KRS, params ...interface{}) res.R
 		)
 	}
 
-	if class.Quota >= 40 {
+	if class.Current >= class.Quota {
 		return res.CreateResponseErr(
 			status.TooMany, 
 			"class quota has reached maximum",

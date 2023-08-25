@@ -5,8 +5,9 @@ import "github.com/google/uuid"
 type Class struct {
 	Model
 	ClassModel
-	Quota     	uint      `gorm:"type:integer;default:40;not null" json:"quota" valid:"type(uint),range(5|100)"`
-	KRS       	[]KRS     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"krs,omitempty"`
+	Quota     	uint    `gorm:"type:integer;default:40;not null" json:"quota" valid:"type(uint),range(5|100)"`
+	Current		uint	`gorm:"type:integer;default:0;not null" json:"current" valid:"type(uint),range(0|100)"`	
+	KRS       	[]KRS   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"krs,omitempty"`
 }
 
 type ClassModel struct {
