@@ -38,7 +38,7 @@ func (classSvc *ClassService) GetParticipants(class *models.Class, student *mode
 		if unit.Student.ID == student.ID {
 			forbidden = false
 		}
-		students = append(students, unit.Student)
+		students = append(students, *unit.Student)
 	}
 
 	if forbidden {
@@ -93,13 +93,22 @@ func (classSvc *ClassService) GetClass(class *models.Class, student *models.Stud
 	return res.CreateResponse(status.Ok, "succesfully fetch class", class)
 }
 
-func (classSvc *ClassService) RegisterClass(class *models.Class) res.Response {
+func (classSvc *ClassService) RegisterClass(classReg *models.ClassRegister) res.Response {
 	var course models.Course
 	var lecturer models.Lecturer
 
-	if _, err := govalidator.ValidateStruct(class); err != nil {
+	if _, err := govalidator.ValidateStruct(classReg); err != nil {
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
+
+	class := models.NewClass(
+		classReg.CourseID,
+		classReg.LecturerID,
+		classReg.ClassName,
+		classReg.ClassRoom,
+		classReg.Quota,
+		classReg.Current,
+	)
 
 	if count := classSvc.Db.Count("class_name", models.Class{}, class.ClassName); count > 0 {
 		return res.CreateResponseErr(status.Conflict, "class with that name already exist", nil)

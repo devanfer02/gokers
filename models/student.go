@@ -11,8 +11,8 @@ type Student struct {
 	UniModel
 	Ipk 		decimal.Decimal		`gorm:"type:decimal(4,2);default:0" json:"ipk" valid:"float,type(float)"`
 	Entrance	string 				`gorm:"type:varchar(100);not null" json:"entrance" valid:"required,type(string)"`
-	KRS			[]KRS				`gorm:"foreignKey:StudentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	KrsDetail 	KrsDetail			`gorm:"foreignKey:StudentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	KRS			*[]KRS				`gorm:"foreignKey:StudentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"omitempty"`
+	KrsDetail 	*KrsDetail			`gorm:"foreignKey:StudentID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"krs_detail,omitempty"`
 }
 
 type StudentUpdate struct {

@@ -31,7 +31,7 @@ func (courseSvc *CourseService) RegisterCourse(course *models.Course) res.Respon
 		return res.CreateResponseErr(status.Conflict,
 			"course code conflicted",
 			fmt.Errorf("course code already exist"),
-		) //FuraMono NFM 
+		) 
 	}
 
 	if err := helpers.CheckTypeExist(&course.Type, &course.Faculty, &course.Major); err != nil {

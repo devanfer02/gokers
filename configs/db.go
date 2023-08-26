@@ -63,15 +63,15 @@ func (baseDb *Database) FindAll(data interface{}) error {
 }
 
 func (baseDb *Database) FindAllCondition(query string, data interface{}, params ...interface{}) error {
-	return baseDb.db.Model(data).Where(query, params).Find(data).Error
+	return baseDb.db.Model(data).Where(query, params...).Find(data).Error
 }
 
 func (baseDb *Database) Find(query string, data interface{}, params ...interface{}) error {
-	return baseDb.db.Model(data).Where(query, params).Find(data).Error
+	return baseDb.db.Model(data).Where(query, params...).Find(data).Error
 }
 
-func (baseDb *Database) FindFirst(query string, data interface{}, params ...interface{}) error {
-	return baseDb.db.Model(data).First(data, query, params).Error
+func (baseDb *Database) FindFirst(query string, data interface{}, param interface{}) error {
+	return baseDb.db.Model(data).First(data, query, param).Error
 }
 
 func (baseDb *Database) FirstByPK(data interface{}, param interface{}) error {
@@ -86,12 +86,34 @@ func (baseDb *Database) UpdateByPK(data interface{}, param interface{}) int64 {
 	return baseDb.db.Model(data).Where("id = ?", param).Updates(data).RowsAffected
 }
 
-func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
-	return baseDb.db.Unscoped().Where(query, params).Delete(data).RowsAffected
+func (baseDb *Database) UpdateMapByCondition(query string, model interface{}, data map[string]interface{}, params ...interface{}) int64 {
+	return baseDb.db.Model(model).Where(query, params).Updates(&data).RowsAffected
 }
 
-func (baseDb *Database) DeleteByPK(data interface{}, params ...interface{}) int64 {
-	return baseDb.db.Unscoped().Where("id = ?", params).Delete(data).RowsAffected
+func (baseDb *Database) Delete(query string, data interface{}, params ...interface{}) int64 {
+	return baseDb.db.Unscoped().Where(query, params...).Delete(data).RowsAffected
+}
+
+func (baseDb *Database) DeleteByPK(data interface{}, param interface{}) int64 {
+	return baseDb.db.Unscoped().Where("id = ?", param).Delete(data).RowsAffected
+}
+
+
+func (baseDb *Database) CountJoins(joins string, queries []string, data interface{}, params []interface{}) int64 {
+	count := int64(0)
+
+	db := baseDb.db.Model(data).Joins(joins)
+
+	for i, query := range queries {
+		db = db.Where(query, params[i])
+	}
+	err := db.Count(&count).Error 
+
+	if err != nil {
+		panic(err)
+	}
+
+	return count
 }
 
 func (baseDb *Database) PreloadChainByPK(foreigns []string, data interface{}, params interface{}) error {

@@ -8,9 +8,9 @@ type Course struct {
 	Type				string 				`gorm:"type:varchar(100);not null" json:"type" valid:"required,type(string)"`
 	Faculty 			string 				`gorm:"type:varchar(100);default:''" json:"faculty" valid:"type(string)"`
 	Major 				string 				`gorm:"type:varchar(100);default:''" json:"major" valid:"type(string)"`
-	Class   			[]Class  			`gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"class,omitempty"`
-	UpperCourse			CoursePrequisites 	`gorm:"foreignKey:UpperID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"upper,omitempty"`
-	CoursePrequisites 	[]CoursePrequisites	`gorm:"foreignKey:PrequisiteID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"prequisites,omitempty"`
+	Class   			*[]Class  			`gorm:"foreignKey:CourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"class,omitempty"`
+	UpperCourse			*CoursePrequisites 	`gorm:"foreignKey:UpperID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"upper,omitempty"`
+	CoursePrequisites 	*[]CoursePrequisites`gorm:"foreignKey:PrequisiteID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"prequisites,omitempty"`
 }
 
 type CoursePrequisites struct {

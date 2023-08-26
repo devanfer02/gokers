@@ -27,3 +27,12 @@ func GetParamID(ctx *gin.Context) (uuid.UUID, error) {
 
 	return id, err
 }
+
+func GetParamUUID(ctx *gin.Context, paramKey string) (uuid.UUID, error) {
+	uuidParam := ctx.Param(paramKey)
+	uuidParam = strings.ReplaceAll(uuidParam, "-", "")
+
+	param, err := uuid.Parse(uuidParam)
+
+	return param, err
+}

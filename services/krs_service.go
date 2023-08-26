@@ -6,9 +6,6 @@ import (
 
 	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/helpers"
-
-	//"github.com/devanfer02/gokers/helpers"
-	//"github.com/devanfer02/gokers/helpers"
 	"github.com/devanfer02/gokers/helpers/res"
 	"github.com/devanfer02/gokers/helpers/status"
 	"github.com/devanfer02/gokers/models"
@@ -79,9 +76,24 @@ func (krsSvc *KrsService) AddClass(krs *models.KRS, params ...interface{}) res.R
 		)
 	}
 
+	if count := krsSvc.Db.CountJoins(
+			"JOIN classes ON krs.class_id = classes.ID",
+			[]string{"classes.course_id = ?", "student_id = ?"}, 
+			krs,
+			[]interface{}{class.CourseID, krs.StudentID},
+		); count > 0 {
+		return res.CreateResponseErr(
+			status.Conflict, 
+			"course already exist",
+			fmt.Errorf("cannot add class, course already exist"),
+		)
+	}
+
+	krs.ID = helpers.GenerateUUID()
+	krs.Sks = class.Course.Sks
 	krs.Semester = helpers.GetCurrentSemester()
 	detail.TotalSks = detail.TotalSks + class.Course.Sks
-	class.Quota = class.Quota + 1
+	class.Current = class.Current + 1
 
 	if err := krsSvc.Db.Create(krs); err != nil {
 		return res.CreateResponseErr(
@@ -111,6 +123,58 @@ func (krsSvc *KrsService) AddClass(krs *models.KRS, params ...interface{}) res.R
 }
 
 func (krsSvc *KrsService) RemoveClass(krs *models.KRS) res.Response {
+	detail := &models.KrsDetail{}
+	class := &models.Class{}
+
+	if err := krsSvc.Db.Find("student_id = ?", detail, krs.StudentID); err != nil {
+		return res.CreateResponseErr(
+			status.NotFound, 
+			"class not found", 
+			err, 
+		)
+	}
+
+	if err := krsSvc.Db.Find("student_id = ? AND class_id = ?", krs, krs.StudentID, krs.ClassID); err != nil {
+		return res.CreateResponseErr(
+			status.NotFound, 
+			"failed to find related data id", 
+			err,
+		)	
+	}
+
+	detail.TotalSks = detail.TotalSks - krs.Sks 
+	hack := int64(class.Current) - 1
+	if hack < 0 { hack = 0 }
+	class.Current = uint(hack)
+	class.ID = krs.ClassID
+	
+
+	if row := krsSvc.Db.UpdateMapByCondition(
+		"student_id = ?", 
+		detail,
+		map[string]interface{}{"TotalSks": detail.TotalSks},
+		krs.StudentID,
+		); row == 0 {
+		return res.CreateResponseErr(
+			status.ServerError, 
+			"failed to update data", 
+			fmt.Errorf("failed to reduce total sks in krs_detail table"), 
+		)
+	}
+
+	if row := krsSvc.Db.UpdateMapByCondition(
+		"id = ?",
+		class, 
+		map[string]interface{}{"Current": class.Current},	
+		krs.ClassID,
+		); row == 0 {
+		return res.CreateResponseErr(
+			status.ServerError, 
+			"failed to update data", 
+			fmt.Errorf("failed to reduce class participants in class table"), 
+		)
+	}
+
 	if rows := krsSvc.Db.Delete("student_id = ? AND class_id = ?", krs, krs.StudentID, krs.ClassID); rows == 0 {
 		return res.CreateResponseErr(
 			status.ServerError, 

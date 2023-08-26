@@ -74,7 +74,7 @@ func (classCtr *ClassController) GetClass(ctx *gin.Context) {
 }
 
 func (classCtr *ClassController) RegisterClass(ctx *gin.Context) {
-	var class models.Class
+	var class models.ClassRegister
 
 	if err := ctx.ShouldBindJSON(&class); err != nil {
 		res.SendResponse(ctx, res.CreateResponseErr(status.BadRequest, "bad body request", err))

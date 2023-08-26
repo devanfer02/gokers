@@ -34,7 +34,7 @@ func (krsCtr *KrsController) GetKrs(ctx *gin.Context) {
 func (krsCtr *KrsController) AddClass(ctx *gin.Context) {
 	var krs models.KRS 
 
-	id, err := helpers.GetParamID(ctx)
+	id, err := helpers.GetParamUUID(ctx, "classId")
 	studentId, ok := helpers.GetStudentID(ctx)
 
 	if !ok {
@@ -57,7 +57,7 @@ func (krsCtr *KrsController) AddClass(ctx *gin.Context) {
 func (krsCtr *KrsController) RemoveClass(ctx *gin.Context) {
 	var krs models.KRS
 
-	id, err := helpers.GetParamID(ctx)
+	id, err := helpers.GetParamUUID(ctx, "classId")
 	studentId, ok := helpers.GetStudentID(ctx)
 
 	if !ok {
