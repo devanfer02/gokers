@@ -9,6 +9,7 @@ import (
 	"github.com/devanfer02/gokers/helpers/res"
 	"github.com/devanfer02/gokers/helpers/status"
 	"github.com/devanfer02/gokers/models"
+	"github.com/devanfer02/gokers/models/constructors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -45,7 +46,7 @@ func (authSvc *AuthService) RegisterStudent(student *models.Student) res.Respons
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
-	krsDtl := models.NewKrsDetail(helpers.GenerateUUID(), student.ID)
+	krsDtl := constructor.NewKrsDetail(helpers.GenerateUUID(), student.ID)
 
 	if err = authSvc.Db.Create(student); err != nil {
 		return res.CreateResponseErr(status.Conflict, "internal server error", err)

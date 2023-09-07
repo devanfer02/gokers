@@ -28,17 +28,4 @@ type ClassModel struct {
 	ClassRoom 	string    	`gorm:"type:varchar(100);not null" json:"class_room" valid:"required"`
 }
 
-func NewClass(courseId, lecturerId uuid.UUID, className, classRoom string, quota, current uint) *Class {
-	class := &Class{}
-
-	class.CourseID = courseId
-	class.LecturerID = lecturerId
-	class.ClassName = className
-	class.ClassRoom = classRoom
-	class.Quota = quota 
-	class.Current = current 
-
-	return class;
-}
-
 

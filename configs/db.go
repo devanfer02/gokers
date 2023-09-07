@@ -148,14 +148,14 @@ func (baseDb *Database) PreloadMany(foreigns []string, data interface{}) error {
 	return query.Find(data).Error
 }
 
-func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, condition string, params ...interface{}) error {
+func (baseDb *Database) PreloadByCondition(foreigns []string, data interface{}, condition string, params interface{}) error {
 	query := baseDb.db 
 
 	for _, foreign := range foreigns {
 		query = query.Preload(foreign)
 	}
 
-	return query.Where(condition, params...).Find(data).Error
+	return query.Where(condition, params).Find(data).Error
 }
 
 func (baseDb *Database) Count(query string, model interface{}, params ...interface{}) int64 {

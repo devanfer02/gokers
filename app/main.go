@@ -31,6 +31,7 @@ func main() {
 	router.InitRouteCourse()
 	router.InitRouteClass()
 	router.InitRouteKrs()
+	router.InitRouteAdmin()
 
 	app.Run(os.Getenv("APP_PORT"))
 }

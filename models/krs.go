@@ -1,6 +1,8 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type KRS struct {
 	Model 
@@ -17,12 +19,4 @@ type KrsDetail struct {
 	StudentID	uuid.UUID 	`gorm:"foreignKey:StudentID;type:varchar(255);not null;constraint:OnUpdate:CASCADE;OnDelete:CASCADE" json:"student_id"`
 	TotalSks 	uint 		`gorm:"type:integer;default:0" json:"total_sks" valid:"type(uint);range(0|24)"`	
 	MaxSks 		uint 		`gorm:"type:integer;default:24" json:"max_sks" valid:"type(uint);range(0|24)"`	
-}
-
-func NewKrsDetail(id uuid.UUID, studentId uuid.UUID) *KrsDetail {
-	krsDtl := &KrsDetail{}
-	krsDtl.ID = id
-	krsDtl.StudentID = studentId
-	krsDtl.MaxSks = 24
-	return krsDtl
 }

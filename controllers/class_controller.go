@@ -18,8 +18,6 @@ func NewClassController(classSvc *services.ClassService) *ClassController {
 }
 
 func (classCtr *ClassController) GetParticipants(ctx *gin.Context) {
-	//TODO: Get participants of class with specified ID
-	//TODO: Test this func
 	var class models.Class
 
 	id, err := helpers.GetParamID(ctx)

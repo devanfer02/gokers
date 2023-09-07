@@ -5,6 +5,7 @@
 2. [Lecturer](#lecturer)
 3. [Course](#course)
 4. [Class](#class)
+5. [KRS](#krs)
 
 ### Student
 1. ##### Register Student 
@@ -649,5 +650,53 @@
         "status": "error",
         "code": 404,
         "message": "class not found"
+    }
+    ```
+### KRS
+1. ##### Add Class
+    endpoint : ```/class/{classId}/students```     
+    method : ```POST```     
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "student's krs updated"
+    }
+    ```
+
+2. ##### Get KRS
+    endpoint : ```/krs```     
+    method : ```GET```    
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "succesfully fetch krs",
+        "data": [
+            {
+                "id": "33d86288-5d20-4509-b75b-49028f520865",
+                "created_at": "2023-09-06T01:19:16.578Z",
+                "updated_at": "2023-09-06T01:19:16.578Z",
+                "student_id": "01ac8ee2-fda0-4f73-b607-38f5cc663aa3",
+                "class_id": "6f9639c4-bd69-4c63-92a6-9da35502457e",
+                "semester": "Ganjil 2023",
+                "grade": "K",
+                "total_sks": 3
+            }
+        ]
+    }
+    ```
+
+3. ##### Remove Class
+    endpoint : ```/krs/{classId}```      
+    method : ```DELETE```      
+    json response : 
+    ```
+    {
+        "status": "success",
+        "code": 200,
+        "message": "successfully delete krs"
     }
     ```

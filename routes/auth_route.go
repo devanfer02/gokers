@@ -10,8 +10,7 @@ func (r *Router) InitRouteAuth() {
 	authCtr := controllers.NewAuthController(authSvc)
 
 	authStudent := r.Router.Group("/auth/student")
-
-	authStudent.POST("/register", authCtr.RegisterStudent)
+	authStudent.POST("/register",authCtr.RegisterStudent)
 	authStudent.POST("/login", authCtr.LoginStudent)
 	authStudent.POST("/logout", authCtr.LogoutStudent)
 

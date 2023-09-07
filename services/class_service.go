@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/gin-gonic/gin"
 	"github.com/devanfer02/gokers/configs"
 	"github.com/devanfer02/gokers/helpers"
 	"github.com/devanfer02/gokers/helpers/res"
 	"github.com/devanfer02/gokers/helpers/status"
 	"github.com/devanfer02/gokers/models"
+	"github.com/devanfer02/gokers/models/constructors"
+	"github.com/gin-gonic/gin"
 )
 
 type ClassService struct {
@@ -21,20 +22,20 @@ func NewClassService(db *configs.Database) *ClassService {
 }
 
 func (classSvc *ClassService) GetParticipants(class *models.Class, student *models.Student) res.Response {
-	var krs *[]models.KRS
+	var krs []models.KRS
 	var students []models.Student
 
 	if err := classSvc.Db.FirstByPK(class, class.ID); err != nil {
 		return res.CreateResponseErr(status.NotFound, "class not found", err)
 	}
 
-	if err := classSvc.Db.PreloadByCondition([]string{"Student"}, krs, "class_id = ?" ,class.ID); err != nil {
+	if err := classSvc.Db.PreloadByCondition([]string{"Student"}, &krs, "class_id = ?" ,class.ID); err != nil {
 		return res.CreateResponseErr(status.ServerError, "internal server error", err)
 	}
 
 	forbidden := true
 
-	for _, unit := range *krs {
+	for _, unit := range krs {
 		if unit.Student.ID == student.ID {
 			forbidden = false
 		}
@@ -101,7 +102,7 @@ func (classSvc *ClassService) RegisterClass(classReg *models.ClassRegister) res.
 		return res.CreateResponseErr(status.BadRequest, "bad body request", err)
 	}
 
-	class := models.NewClass(
+	class := constructor.NewClass(
 		classReg.CourseID,
 		classReg.LecturerID,
 		classReg.ClassName,
