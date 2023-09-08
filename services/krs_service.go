@@ -177,9 +177,9 @@ func (krsSvc *KrsService) RemoveClass(krs *models.KRS) res.Response {
 
 	if rows := krsSvc.Db.Delete("student_id = ? AND class_id = ?", krs, krs.StudentID, krs.ClassID); rows == 0 {
 		return res.CreateResponseErr(
-			status.ServerError, 
+			status.NotFound, 
 			"failed to delete data", 
-			fmt.Errorf("failed to delete krs"), 
+			fmt.Errorf("data not found"), 
 		)
 	}
 
